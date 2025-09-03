@@ -1,3 +1,5 @@
+const dotnev=require("dotenv");
+
 require('dotenv').config();
 
 const config = {
