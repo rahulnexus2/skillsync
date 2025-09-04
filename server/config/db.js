@@ -1,5 +1,5 @@
 import mongoose from "mongoose";
-const config = require("./config")
+import config from "./config.js"
 
 
 
@@ -9,7 +9,7 @@ const connectDB = async () => {
         console.log('Mongodb is Connected ');
     });
 
-    await mongoose.connect(`${config.mongoURI}/skillsync`);
+    await mongoose.connect(`${config.mongoURI}`);
 };
 
 export default connectDB;

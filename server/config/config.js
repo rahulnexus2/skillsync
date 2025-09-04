@@ -1,9 +1,9 @@
-const dotnev=require("dotenv");
+import dotenv from 'dotenv'
 
-require('dotenv').config();
+dotenv.config();
 
 const config = {
-  port: process.env.PORT || 3000,
+  port: process.env.PORT ||3000,
   mongoURI: process.env.MONGODB_URL,
   jwtSecret: process.env.JWT_SECRET,
   email: {
@@ -12,4 +12,4 @@ const config = {
   },
 };
 
-module.exports = config;
+export default config;

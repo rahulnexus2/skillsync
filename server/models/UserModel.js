@@ -1,6 +1,13 @@
-const Mongoose=require("mongoose");
+import Mongoose from "mongoose";
 
 const userSchema=new Mongoose.Schema({
+  username:{
+    type:String,
+    required:true,
+    lowercase:true,
+    trim:true
+  },
+
   email:{
     type:String,
     unique:true,
@@ -13,6 +20,8 @@ const userSchema=new Mongoose.Schema({
     required:true,
     trim:true,
   },
+
+
    otp: {
     type: String, 
   },
@@ -30,9 +39,9 @@ const userSchema=new Mongoose.Schema({
     type: Date,
     default: Date.now,
   },
-})
+},  { timestamps: true },)
 
-const User=Mongoose.models("User",userSchema)||Mongoose.models.User;
+const User=Mongoose.model("User",userSchema)||Mongoose.models.User;
 
 
 export default User;
