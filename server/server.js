@@ -4,6 +4,7 @@ import cors from "cors";
 
 import config from "./config/config.js";
 import userRoute from "./routes/userRoute.js";
+import adminRoute from "./routes/adminRoute.js"
 
 const app = express();
 const port = config.port;
@@ -16,6 +17,8 @@ app.get("/", (req, res) => {
 });
 
 app.use("/api/v1/users", userRoute);
+
+app.use("/api/v1/admin",adminRoute);
 
 const startServer = async () => {
   try {

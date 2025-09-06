@@ -1,4 +1,4 @@
-import config from "../config/config.js";
+
 import bcrypt from "bcryptjs";
 
 import User from "../models/UserModel.js";
