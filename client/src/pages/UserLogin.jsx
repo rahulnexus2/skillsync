@@ -2,23 +2,26 @@ import React from "react";
 import { useForm } from "react-hook-form";
 import axios from "axios";
 
-export const Signup = () => {
-  const {
+
+
+export const UserLogin = () => {
+  
+   const {
     register,
     handleSubmit,
     setError,
-    reset,
+    
     formState: { errors },
   } = useForm();
 
   const onSubmit = async (data) => {
     try {
       const res = await axios.post(
-        "http://localhost:8000/api/v1/users/signup",
+        "http://localhost:8000/api/v1/users/login",
         data
+        
       );
       alert(res.data.user.message);
-      reset();
     } catch (err) {
       const backendErrors = err.response?.data?.errors;
       const globalErrors = err.response?.data?.message;
@@ -36,28 +39,12 @@ export const Signup = () => {
     <div className="flex justify-center items-center min-h-screen bg-gradient-to-r from-[#3B38A0] to-[#647FBC] p-4">
       <div className="w-full max-w-md bg-white shadow-lg rounded-2xl p-8">
         <h2 className="text-2xl font-bold text-center text-gray-800 mb-6">
-          Create an Account
+          Login your Account
         </h2>
 
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-5">
           
-          <div>
-            <input
-              type="text"
-              placeholder="Enter your Username"
-              className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-indigo-500"
-              {...register("username", {
-                required: { value: true, message: "Username is required" },
-                minLength: { value: 4, message: "Min length is 4" },
-                maxLength: { value: 10, message: "Max length is 10" },
-              })}
-            />
-            {errors.username && (
-              <p className="text-red-500 text-sm mt-1">
-                {errors.username.message}
-              </p>
-            )}
-          </div>
+          
 
           
           <div>
@@ -110,7 +97,7 @@ export const Signup = () => {
             
             className="w-full bg-indigo-600 text-white py-3 rounded-lg hover:bg-indigo-700 transition duration-300"
           >
-            Sign Up
+            Login
           </button>
         </form>
 
@@ -118,5 +105,7 @@ export const Signup = () => {
         
       </div>
     </div>
-  );
-};
+  )
+}
+
+
