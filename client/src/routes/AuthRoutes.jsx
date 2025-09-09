@@ -1,6 +1,6 @@
 import React from "react";
 import { Routes, Route, Navigate } from "react-router-dom";
-import AuthLayout from "../components/AuthLayout";
+import AuthLayout from "../Layouts/AuthLayout";
 
 
 import { UserSignup } from "../pages/UserSignup";
@@ -14,7 +14,7 @@ export const AuthRoutes = () => {
   return (
     <Routes>
       <Route path="/" element={<Navigate to="/users" replace />} />
-
+                    
     
       <Route path="/users" element={<AuthLayout type="user" />}>
         <Route index element={<Navigate to="signup" replace />} />

@@ -1,21 +1,15 @@
-import { useState } from 'react'
+import { useState } from "react";
 
-import { BrowserRouter ,Routes} from 'react-router-dom';
-import {AuthRoutes} from './routes/AuthRoutes'
-
- function App() {
-  
-
+import { BrowserRouter } from "react-router-dom";
+import { AuthRoutes } from "./routes/AuthRoutes";
+import AdminDashboard  from './Dashboards/AdminDashboard'
+function App() {
   return (
-
     <>
-    
-    
-     <BrowserRouter>
-    
-       <AuthRoutes></AuthRoutes>
-       
-       </BrowserRouter> 
+      <BrowserRouter>
+      <AdminDashboard></AdminDashboard>
+        {/* <AuthRoutes></AuthRoutes> */}
+      </BrowserRouter>
     </>
   );
 }

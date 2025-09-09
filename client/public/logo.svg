@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 480 160" role="img" aria-labelledby="title desc">
+  <title id="title">SkillSync Logo</title>
+  <desc id="desc">Professional SkillSync logo with centered slogan</desc>
+
+  <!-- Briefcase with Check -->
+  <g transform="translate(20,40)">
+    <!-- Bag body -->
+    <rect x="0" y="25" width="60" height="40" rx="6" fill="url(#grad1)"/>
+    <!-- Bag flap -->
+    <rect x="0" y="15" width="60" height="18" rx="3" fill="url(#grad2)"/>
+    <!-- Handle -->
+    <rect x="22" y="2" width="16" height="8" rx="2" fill="#1e3a8a"/>
+    <!-- Check Circle -->
+    <circle cx="46" cy="52" r="11" fill="white"/>
+    <path d="M40 52l4 4 8-8" stroke="#3b82f6" stroke-width="2.8" fill="none" stroke-linecap="round"/>
+  </g>
+
+  <!-- Brand Text -->
+  <text x="110" y="70" font-family="Poppins, Inter, Arial, sans-serif" font-size="38" font-weight="700" fill="#1e3a8a">
+    Skill<tspan fill="url(#grad1)">Sync</tspan>
+  </text>
+
+  <!-- Slogan centered below -->
+  <text x="110" y="98" font-family="Poppins, Inter, Arial, sans-serif" font-size="16" font-weight="500" fill="#475569" text-anchor="start">
+    get hired
+  </text>
+
+  <!-- Gradient Definitions -->
+  <defs>
+    <linearGradient id="grad1" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#3b82f6"/>  <!-- Blue -->
+      <stop offset="100%" stop-color="#9333ea"/> <!-- Purple -->
+    </linearGradient>
+    <linearGradient id="grad2" x1="0%" y1="0%" x2="100%" y2="0%">
+      <stop offset="0%" stop-color="#2563eb"/> <!-- Darker blue -->
+      <stop offset="100%" stop-color="#7e22ce"/> <!-- Darker purple -->
+    </linearGradient>
+  </defs>
+</svg>
