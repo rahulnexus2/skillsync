@@ -2,7 +2,7 @@ import Admin from "../models/AdminModel.js";
 
 export const adminSignupAuth = async (req, res, next) => {
   try {
-    const { email } = req.body;
+    const { email } = req.body; 
 
     const ExistingAdmin = await Admin.findOne({ email });
 

@@ -7,8 +7,7 @@ function App() {
   return (
     <>
       <BrowserRouter>
-      <AdminDashboard></AdminDashboard>
-        {/* <AuthRoutes></AuthRoutes> */}
+     
       </BrowserRouter>
     </>
   );

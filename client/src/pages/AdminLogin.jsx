@@ -1,6 +1,8 @@
 import React from "react";
 import { useForm } from "react-hook-form";
 import axios from "axios";
+import { useNavigate } from "react-router-dom";
+import {JwtDecode} from 'jwt-decode';
 
 export const AdminLogin = () => {
   const {
@@ -9,6 +11,8 @@ export const AdminLogin = () => {
     setError,
     formState: { errors },
   } = useForm();
+
+  const Navigate=useNavigate();
 
   const onSubmit = async (data) => {
     try {
@@ -21,6 +25,19 @@ export const AdminLogin = () => {
       console.log(token);
       localStorage.setItem("adminToken", token);
       alert(res.data.message);
+
+      const decode=JwtDecode(token);
+
+      if(decode.data=="admin")
+      {
+        Navigate("/admin/dashboard")
+      }
+      else{
+        alert("unauthorized acess")
+      }
+
+
+
     } catch (err) {
       const backendErrors = err.response?.data?.errors;
       const globalErrors = err.response?.data?.message;

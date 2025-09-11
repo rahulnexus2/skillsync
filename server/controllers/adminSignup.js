@@ -17,6 +17,7 @@ export const adminSignup = async (req, res) => {
       username,
       email,
       password: hashPass,
+      role:"admin"
       
     });
 

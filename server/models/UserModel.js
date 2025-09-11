@@ -21,6 +21,12 @@ const userSchema = new Mongoose.Schema(
       required: true,
       trim: true,
     },
+    role:{
+    type:String,
+    enum:["user"],
+     default: "user"
+
+  },
 
     otp: {
       type: String,
