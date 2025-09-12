@@ -1,4 +1,4 @@
-import React from 'react'
+/* import React from 'react'
 import {Routes ,Route,Navigate} from 'react-router-dom'
 import AdminDashLayout from '../Layouts/AdminDashLayout'
 
@@ -27,3 +27,4 @@ const AdminDashboard = () => {
 }
 
 export default AdminDashboard
+ */

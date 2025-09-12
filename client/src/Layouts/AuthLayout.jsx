@@ -5,7 +5,7 @@ import { Users, Shield, ChevronLeft } from "lucide-react";
 const AuthLayout = ({ type }) => {
   const location = useLocation();
   const isUser = type === "user";
-  const basePath = isUser ? "/users" : "/admin";
+  const basePath = isUser ? "/user" : "/admin";
   const isSignup = location.pathname.includes('signup');
   
   // Configuration for different portal types

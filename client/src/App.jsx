@@ -1,13 +1,14 @@
-import { useState } from "react";
+
+import {Routeconfig} from "./routes/Routeconfig";
 
 import { BrowserRouter } from "react-router-dom";
-import { AuthRoutes } from "./routes/AuthRoutes";
-import AdminDashboard  from './Dashboards/AdminDashboard'
+
 function App() {
   return (
     <>
       <BrowserRouter>
-     
+    <Routeconfig/>
+      
       </BrowserRouter>
     </>
   );

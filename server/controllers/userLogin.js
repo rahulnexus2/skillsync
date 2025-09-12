@@ -8,7 +8,7 @@ export const userLogin = async (req, res) => {
         id: user._id,
          email:user.email,
         password:user.password,
-        type:user.type
+        role:user.role
       },
       process.env.JWT_SECRET,
       {

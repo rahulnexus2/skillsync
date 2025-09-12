@@ -2,9 +2,10 @@ import React from "react";
 import { useForm } from "react-hook-form";
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
-import {JwtDecode} from 'jwt-decode';
+import {jwtDecode} from 'jwt-decode';
 
 export const UserLogin = () => {
+  const navigate=useNavigate()
   const {
     register,
     handleSubmit,
@@ -23,11 +24,13 @@ export const UserLogin = () => {
       console.log(token);
       localStorage.setItem("userToken", token);
       alert(res.data.message);
-      const decode=JwtDecode(token);
+      const decode=jwtDecode(token);
+      console.log(decode);
       
-            if(decode.data=="user")
+      
+            if(decode.role==="user")
             {
-              Navigate("/user/dashboard")
+              navigate("/user/dashboard")
             }
             else{
               alert("unauthorized acess")

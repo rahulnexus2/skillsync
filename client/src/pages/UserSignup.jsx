@@ -21,7 +21,7 @@ export const UserSignup = () => {
       );
       alert(res.data.user.message);
       reset();
-      navigate('/users/login')
+      navigate('/user/login')
       
     } catch (err) {
       const backendErrors = err.response?.data?.errors;

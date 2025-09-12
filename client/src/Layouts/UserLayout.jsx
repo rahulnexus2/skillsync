@@ -32,15 +32,15 @@ const NavItem = ({ to, icon: Icon, label, isActive, mobile = false, onClick }) =
   );
 };
 
-export const AdminDashLayout = () => {
+export const UserDashLayout = () => {
   const location = useLocation();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [activeItem, setActiveItem] = useState(location.pathname || '/user/profile');
 
   const navItems = [
-    { to: '/admin/jobs', icon: Briefcase, label: 'Jobs' },
-    { to: '/admin/quizes', icon: HelpCircle, label: 'Quizzes' },
-    { to: '/admin/chatroom', icon: MessageCircle, label: 'Chatroom' }
+    { to: '/user/jobs', icon: Briefcase, label: 'Jobs' },
+    { to: '/user/quizes', icon: HelpCircle, label: 'Quizzes' },
+    { to: '/user/chatroom', icon: MessageCircle, label: 'Chatroom' }
   ];
 
   const handleNavClick = (to) => setActiveItem(to);
