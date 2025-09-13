@@ -58,6 +58,8 @@ export const Routeconfig = () => {
         <Route path="jobs" element={<Jobs />} />
         <Route path="quizes" element={<Quizes />} />
         <Route path="chatroom" element={<AdminChat />} />
+       {/*  <Route path="jobs/createjob" element={<CreateJobLayout/>}></Route>
+        <Route path="jobs/viewjob" element={<ViewCreateJobLayout/>}></Route> */}
       </Route>
 
       {/* Catch-all redirect */}

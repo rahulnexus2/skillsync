@@ -34,8 +34,6 @@ username: {
   }
 
 
-
-
 })
 
 const Admin=Mongoose.model("Admin",adminSchema)||Mongoose.models.Admin

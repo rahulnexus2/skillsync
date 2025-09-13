@@ -50,6 +50,8 @@ app.use("/api/v1/users", userRoute);
 
 app.use("/api/v1/admin",adminRoute);
 
+
+
 const startServer = async () => {
   try {
     await connectDB();
