@@ -1,4 +1,4 @@
-import jobModel from '../models/JobModel.js'
+import Job from '../models/JobModel.js'
 
 
 export const createJob=async(req,res)=>{
@@ -16,7 +16,7 @@ export const createJob=async(req,res)=>{
 
       const {_id,username}=req.admin;
       
-      const newJob=new jobModel({
+      const newJob=new Job({
         jobTitle,
         company,
         jobDescription,
@@ -31,7 +31,6 @@ export const createJob=async(req,res)=>{
 
         }
       })
-
       await newJob.save()
 
       res.status(201).json({msg:"job created sucessfully"})

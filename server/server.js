@@ -22,8 +22,6 @@ app.use(cors());
 app.use(express.json());
 
 
-
-
 Oauth();
 
 app.get("/auth/google", passport.authenticate("google", { scope: ["profile", "email"] }));
@@ -47,7 +45,6 @@ app.get("/", (req, res) => {
 });
 
 app.use("/api/v1/users", userRoute);
-
 app.use("/api/v1/admin",adminRoute);
 
 
