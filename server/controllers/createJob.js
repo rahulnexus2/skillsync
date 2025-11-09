@@ -33,14 +33,16 @@ export const createJob=async(req,res)=>{
       })
       await newJob.save()
 
-      res.status(201).json({msg:"job created sucessfully"})
+      res.status(201).json({messsage:"job created sucessfully"})
 
   }
   catch(error)
   {
       console.log(error)
       res.status(502).json(
-        {msg:"cannot create job"
-        ,error:error.message}
+        {
+          messsage:"cannot create job"
+        ,error:error.message
+      }
       )}
 }

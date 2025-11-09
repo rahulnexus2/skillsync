@@ -6,7 +6,7 @@ export const adminAuth = async(req, res, next) => {
   try {
     
     const authHeader = req.headers.authorization;
-    if (!authHeader) return res.status(401).json({ msg: "No token provided" });
+    if (!authHeader) return res.status(401).json({ message: "No token provided" });
 
     const token = authHeader.split(" ")[1]; 
 
@@ -15,7 +15,7 @@ export const adminAuth = async(req, res, next) => {
 
    
     const admin = await Admin.findById(decoded.id);
-    if (!admin) return res.status(403).json({ msg: "Admin not found" });
+    if (!admin) return res.status(403).json({ messsage: "Admin not found" });
   
     req.admin = admin;
 
