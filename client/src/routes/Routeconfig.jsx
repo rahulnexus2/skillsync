@@ -22,6 +22,11 @@ import AdminChat from "../Component/AdminChat";
 import UserAbout from "../Component/UserAbout";
 import UserChat from "../Component/UserChat";
 
+import  JobCreation  from "../JobCrud/JobCreation";
+import  JobViewAll  from "../JobCrud/JobViewAll"; 
+import  JobDetails  from "../JobCrud/JobDetails"; 
+import  JobUpdate  from "../JobCrud/JobUpdate"
+
 export const Routeconfig = () => {
   return (
     <Routes>
@@ -40,6 +45,8 @@ export const Routeconfig = () => {
         <Route index element={<Navigate to="signup" replace />} />
         <Route path="signup" element={<AdminSignup />} />
         <Route path="login" element={<AdminLogin />} />
+
+
       </Route>
 
       {/* ---------------- User Protected Routes ---------------- */}
@@ -55,9 +62,19 @@ export const Routeconfig = () => {
       <Route path="/admin" element={<AdminDashLayout />}>
         <Route path="dashboard" element={<AdminAbout />} /> {/* Replace with actual Dashboard Component */}
         <Route path="about" element={<AdminAbout />} />
-        <Route path="jobs" element={<Jobs />} />
         <Route path="quizes" element={<Quizes />} />
         <Route path="chatroom" element={<AdminChat />} />
+
+
+        <Route path="jobs" element={<Jobs/>} >
+        <Route index element={<JobViewAll/>} />  
+          <Route path="create" element={<JobCreation/>} /> 
+          <Route path="view/:jobId" element={<JobDetails/>} />
+          <Route path="update/:jobId" element={<JobUpdate/>} /> 
+        </Route>
+
+       
+
        {/*  <Route path="jobs/createjob" element={<CreateJobLayout/>}></Route>
         <Route path="jobs/viewjob" element={<ViewCreateJobLayout/>}></Route> */}
       </Route>
