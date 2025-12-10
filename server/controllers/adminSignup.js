@@ -2,13 +2,12 @@ import Admin from "../models/AdminModel.js";
 import bcrypt from "bcryptjs";
 import config from "../config/config.js";
 
-
 export const adminSignup = async (req, res) => {
   try {
     const { username, email, password, adminkey } = req.body;
 
     if (adminkey !== config.adminKey) {
- return res.status(400).json({ success: false, message: "Cannot register as admin, invalid key" });
+      return res.status(400).json({ success: false, message: "Cannot register as admin, invalid key" });
     }
 
     const hashPass = await bcrypt.hash(password, 10);
@@ -17,10 +16,8 @@ export const adminSignup = async (req, res) => {
       username,
       email,
       password: hashPass,
-      role:"admin"
-      
+      role: "admin"
     });
-
 
     await newAdmin.save();
 
@@ -28,12 +25,12 @@ export const adminSignup = async (req, res) => {
       message: "admin registered sucessfully",
       id: newAdmin.id,
       email: newAdmin.email,
-    
     });
-  
-   } catch (error) {
+
+  } catch (error) {
     res.status(500).json({
-       message: "server error ",
-        error: error.message });
+      message: "server error ",
+      error: error.message
+    });
   }
 };

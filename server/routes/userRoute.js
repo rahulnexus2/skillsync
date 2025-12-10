@@ -5,11 +5,23 @@ import { userLogin } from "../controllers/userLogin.js";
 import { signupAuth } from "../Auth/signupAuth.js";
 
 import { loginAuth } from "../Auth/loginAuth.js";
+import { userAuth } from "../Auth/userAuth.js";
+
+import { viewQuiz } from "../controllers/viewQuiz.js";
+import { viewQuizById } from "../controllers/viewQuizById.js";
+import { submitQuiz } from "../controllers/submitQuiz.js";
+import { getQuizAttempts } from "../controllers/getQuizAttempts.js";
 
 const router = express.Router();
 
 router.post("/signup", signupAuth, userSignup);
 router.post("/login", loginAuth, userLogin);
+
+// Quiz routes for users
+router.get("/quizzes", viewQuiz);
+router.get("/quizzes/:id", viewQuizById);
+router.post("/submitquiz", userAuth, submitQuiz);
+router.get("/quizattempts", userAuth, getQuizAttempts);
 
 
 

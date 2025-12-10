@@ -13,19 +13,19 @@ export const updateJob = async (req, res) => {
     });
 
     if (!updatedJob) {
-      return res.status(404).json({ success: false, message: "Job not found" });
+      return res.status(404).json({ success:false, message:"Job not found"});
     }
 
     res.status(200).json({
-      success: true,
-      message: "Job updated successfully",
-      data: updatedJob
+      success:true,
+      message:"Job updated successfully",
+      data:updatedJob
     });
   } catch (error) {
     res.status(500).json({
-      success: false,
-      message: "Error updating job",
-      error: error.message
+      success:false,
+      message:"Error updating job",
+      error:error.message
     });
   }
 };

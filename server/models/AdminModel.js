@@ -9,7 +9,6 @@ username: {
       trim: true,
     },
 
-
   email:{
     type:String,
     unique: true,
@@ -31,12 +30,8 @@ username: {
      default: "admin"
 
   }
-
-
 })
 
 const Admin=Mongoose.model("Admin",adminSchema)||Mongoose.models.Admin
-
-
 
 export default Admin
