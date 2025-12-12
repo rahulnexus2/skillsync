@@ -1,113 +1,192 @@
-  import React from 'react'
-  import { useForm } from "react-hook-form";
-  import { useNavigate } from "react-router-dom";
-  import {jwtDecode} from 'jwt-decode';
+import React from 'react';
+import { useForm } from "react-hook-form";
+import { useNavigate } from "react-router-dom";
+import { Briefcase, Building, MapPin, Calendar, CheckCircle } from 'lucide-react';
 
+const JobCreation = () => {
+  const {
+    register,
+    handleSubmit,
+    setError,
+    formState: { errors, isSubmitting },
+  } = useForm();
 
-   const JobCreation = () => {
+  const navigate = useNavigate();
 
-    const {
-        register,
-        handleSubmit,
-        setError,
-        formState: { errors },
-      } = useForm();
-
-      const navigate=useNavigate();
-      const onSubmit = async (data) => {
-      try {
-        const res = await axios.post(
-          "http://localhost:8000/api/v1/admin/createjob",
-          data
-        );
-        
-        alert(res.data.message);
-
-      }catch (err) {
-        const backendErrors = err.response?.data?.errors;
-        const globalErrors = err.response?.data?.message;
-        if (backendErrors) {
-          Object.keys(backendErrors).forEach((field) => {
-            setError(field, { type: "server", message: backendErrors[field] });
-          });
-        } else if (globalErrors) {
-          setError("root", { type: "server", message: globalErrors });
-        }
+  const onSubmit = async (data) => {
+    try {
+      // Split skills string into array
+      const formattedData = {
+        ...data,
+        skills: data.skills.split(',').map(s => s.trim())
       };
-    return (
-      <div>
-        <form onSubmit={handleSubmit(onSubmit)}>
-        <label >job title</label>
-        <input type="text" placeholder='enter job title'{...register("jobTitile",{
-          required:{value:true,message:"job title cannot be empty"},
-          maxLength:{value:12,message:"job title cannot exceed 12 characters"}
-        })} />
-        {errors.jobTitle&&(
-          <p>{errors.jobTitle.message}</p>
-        )}
 
+      const token = localStorage.getItem('token');
+      const res = await fetch("http://localhost:8000/api/v1/admin/createjob", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${token}`
+        },
+        body: JSON.stringify(formattedData)
+      });
 
-        <label >company Name</label>
-        <input type="text" placeholder='enter company name' {...register("company",{
-          required:{value:true,message:"company name should be specified"}
-        })} />
-        
-        {errors.company&&(
-          <p>{errors.company.message}</p>
-        )}
+      const result = await res.json();
 
+      if (!res.ok) {
+        throw new Error(result.message || "Failed to create job");
+      }
 
-        <label > add jobDescription</label>
-        <input type="text" placeholder='add jobDescription'{...register("jobDescription",{
-          required:{value:true,message:"job description is compulsary"}
-        })}/>
-        {errors.jobDescription&&(
-          <p>{errors.jobDescription.message}</p>
-        )}
+      alert(result.message);
+      navigate('/admin/jobs');
 
-        <label > add jobType</label>
-        <input type="text" placeholder='add  eg remote, fulltime ,internship'{...register("jobType",{
-          required:{value:true,message:"jobType must be specified"}
-        })}/>
-        {errors.jobType&&(
-          <p>{errors.jobType.message}</p>
-        )}
+    } catch (err) {
+      console.error(err);
+      setError("root", { type: "server", message: err.message });
+    }
+  };
 
-        <label > add jobLocation</label>
-        <input type="text" placeholder='add  eg remote, fulltime ,internship'{...register("location",{
-          required:{value:true,message:"jobLocation must be specified"}
-        })}/>
-        {errors.joblocation&&(
-          <p>{errors.location.message}</p>
-        )}
-
-        <label > Required skills</label>
-        <input type="text" placeholder='add  eg remote, fulltime ,internship'{...register("skills",{
-          required:{value:true,message:"jobskills must be specified"}
-        })}/>
-        {errors.skills&&(
-          <p>{errors.skills.message}</p>
-        )}
-
-        <label >application deadline </label>
-        <input type="text" placeholder='add  eg remote, fulltime ,internship'{...register("deadline",{
-          required:{value:true,message:"deadline must be specified"}
-        })}/>
-        {errors.deadline&&(
-          <p>{errors.deadline.message}</p>
-        )}
-
-            {errors.root && (<p>
-              {errors.root.message}
-            </p>)}
-              <button
-              type="submit">submit</button>
-            </form>
+  return (
+    <div className="max-w-2xl mx-auto">
+      <div className="text-center mb-8">
+        <h2 className="text-2xl font-bold text-slate-800">Post a New Job</h2>
+        <p className="text-slate-500">Find the best talent for your team.</p>
       </div>
-    )
-  }
 
-  }
+      <form onSubmit={handleSubmit(onSubmit)} className="bg-white p-6 rounded-xl shadow-md space-y-5 border border-gray-100">
 
+        {/* Job Title */}
+        <div>
+          <label className="block text-sm font-medium text-slate-700 mb-1">Job Title</label>
+          <div className="relative">
+            <Briefcase className="absolute left-3 top-2.5 text-slate-400 w-5 h-5" />
+            <input
+              type="text"
+              className="w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none"
+              placeholder="e.g. Senior Software Engineer"
+              {...register("jobTitle", {
+                required: "Job title is required",
+                maxLength: { value: 50, message: "Title too long" }
+              })}
+            />
+          </div>
+          {errors.jobTitle && <p className="text-red-500 text-xs mt-1">{errors.jobTitle.message}</p>}
+        </div>
 
-  export default JobCreation
+        {/* Company Name */}
+        <div>
+          <label className="block text-sm font-medium text-slate-700 mb-1">Company Name</label>
+          <div className="relative">
+            <Building className="absolute left-3 top-2.5 text-slate-400 w-5 h-5" />
+            <input
+              type="text"
+              className="w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent outline-none"
+              placeholder="e.g. Tech Corp"
+              {...register("company", { required: "Company name is required" })}
+            />
+          </div>
+          {errors.company && <p className="text-red-500 text-xs mt-1">{errors.company.message}</p>}
+        </div>
+
+        {/* Job Post/Role */}
+        <div>
+          <label className="block text-sm font-medium text-slate-700 mb-1">Job Role/Post</label>
+          <input
+            type="text"
+            className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
+            placeholder="e.g. Backend Developer"
+            {...register("jobPost", { required: "Job post is required" })}
+          />
+          {errors.jobPost && <p className="text-red-500 text-xs mt-1">{errors.jobPost.message}</p>}
+        </div>
+
+        {/* Job Description */}
+        <div>
+          <label className="block text-sm font-medium text-slate-700 mb-1">Description</label>
+          <textarea
+            className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none h-32"
+            placeholder="Describe the role responsibilities and requirements..."
+            {...register("jobDescription", { required: "Description is required" })}
+          />
+          {errors.jobDescription && <p className="text-red-500 text-xs mt-1">{errors.jobDescription.message}</p>}
+        </div>
+
+        <div className="grid grid-cols-2 gap-4">
+          {/* Job Type */}
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-1">Job Type</label>
+            <select
+              className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
+              {...register("jobType", { required: "Job type is required" })}
+            >
+              <option value="">Select Type</option>
+              <option value="fulltime">Full Time</option>
+              <option value="parttime">Part Time</option>
+              <option value="internship">Internship</option>
+              <option value="remote">Remote</option>
+            </select>
+            {errors.jobType && <p className="text-red-500 text-xs mt-1">{errors.jobType.message}</p>}
+          </div>
+
+          {/* Location */}
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-1">Location</label>
+            <div className="relative">
+              <MapPin className="absolute left-3 top-2.5 text-slate-400 w-5 h-5" />
+              <input
+                type="text"
+                className="w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
+                placeholder="e.g. New York, NY"
+                {...register("location", { required: "Location is required" })}
+              />
+            </div>
+            {errors.location && <p className="text-red-500 text-xs mt-1">{errors.location.message}</p>}
+          </div>
+        </div>
+
+        {/* Skills */}
+        <div>
+          <label className="block text-sm font-medium text-slate-700 mb-1">Required Skills (comma separated)</label>
+          <input
+            type="text"
+            className="w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
+            placeholder="e.g. React, Node.js, MongoDB"
+            {...register("skills", { required: "Skills are required" })}
+          />
+          {errors.skills && <p className="text-red-500 text-xs mt-1">{errors.skills.message}</p>}
+        </div>
+
+        {/* Deadline */}
+        <div>
+          <label className="block text-sm font-medium text-slate-700 mb-1">Application Deadline</label>
+          <div className="relative">
+            <Calendar className="absolute left-3 top-2.5 text-slate-400 w-5 h-5" />
+            <input
+              type="date"
+              className="w-full pl-10 pr-4 py-2 border rounded-lg focus:ring-2 focus:ring-indigo-500 outline-none"
+              {...register("deadline", { required: "Deadline is required" })}
+            />
+          </div>
+          {errors.deadline && <p className="text-red-500 text-xs mt-1">{errors.deadline.message}</p>}
+        </div>
+
+        {/* Root Error */}
+        {errors.root && (
+          <div className="p-3 bg-red-50 text-red-600 rounded-lg text-sm text-center">
+            {errors.root.message}
+          </div>
+        )}
+
+        <button
+          type="submit"
+          disabled={isSubmitting}
+          className="w-full bg-indigo-600 text-white font-bold py-3 rounded-lg hover:bg-indigo-700 transition duration-200 disabled:opacity-70 flex justify-center items-center"
+        >
+          {isSubmitting ? 'Posting...' : 'Create Job Opening'}
+        </button>
+      </form>
+    </div>
+  );
+};
+
+export default JobCreation;

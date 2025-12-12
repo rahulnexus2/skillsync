@@ -65,7 +65,10 @@ export const Routeconfig = () => {
       <Route path="/user" element={<UserDashLayout />}>
         <Route path="dashboard" element={<UserAbout />} /> {/* Replace with actual Dashboard Component */}
         <Route path="profile" element={<UserAbout />} /> {/* Replace with Profile Component */}
-        <Route path="jobs" element={<Jobs />} />
+        <Route path="jobs" element={<Jobs />}>
+          <Route index element={<JobViewAll isAdmin={false} />} />
+          <Route path="view/:id" element={<JobDetails />} />
+        </Route>
         <Route path="quizes" element={<QuizList />} />
         <Route path="quizes/take/:quizId" element={<QuizTake />} />
         <Route path="quizes/result/:attemptId" element={<QuizResult />} />
