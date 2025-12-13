@@ -33,7 +33,7 @@ export const createJob = async (req, res) => {
     })
     await newJob.save()
 
-    res.status(201).json({ message: "job created sucessfully" })
+    res.status(201).json({ messsage: "job created sucessfully" })
 
   }
   catch (error) {

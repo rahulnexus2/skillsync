@@ -4,7 +4,7 @@ import cors from "cors";
 
 import session from "express-session";
 import passport from "passport";
-import {Oauth} from "./Oauth/Oauth.js"
+import { Oauth } from "./Oauth/Oauth.js"
 
 import config from "./config/config.js";
 import userRoute from "./routes/userRoute.js";
@@ -13,12 +13,20 @@ import adminRoute from "./routes/adminRoute.js"
 const app = express();
 const port = config.port;
 
+app.use(cors({
+  origin: ["http://localhost:5173", "http://127.0.0.1:5173"],
+  credentials: true
+}));
+
+app.use((req, res, next) => {
+  console.log(`[REQUEST] ${req.method} ${req.url}`);
+  next();
+});
+
 app.use(session({ secret: "mysecret", resave: false, saveUninitialized: true }));
 app.use(passport.initialize());
 app.use(passport.session())
 
-
-app.use(cors());
 app.use(express.json());
 
 
@@ -45,11 +53,12 @@ app.get("/", (req, res) => {
 });
 
 app.use("/api/v1/users", userRoute);
-app.use("/api/v1/admin",adminRoute);
+app.use("/api/v1/admin", adminRoute);
 
 
 
 const startServer = async () => {
+  console.log("Starting server with updated CORS config...");
   try {
     await connectDB();
     console.log("✅ Connected to MongoDB");

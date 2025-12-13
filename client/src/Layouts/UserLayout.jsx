@@ -3,7 +3,8 @@ import React, { useState, useEffect } from 'react';
 import { User, Briefcase, HelpCircle, MessageCircle, Menu, X, Sparkles } from 'lucide-react';
 
 // Reusable Navigation Item (handles Profile too)
-const NavItem = ({ to, icon: Icon, label, isActive, mobile = false, onClick }) => {
+const NavItem = ({ to, icon, label, isActive, mobile = false, onClick }) => {
+  const Icon = icon;
   const baseClasses = mobile
     ? 'flex items-center space-x-4 px-6 py-4 rounded-2xl transition-all duration-300 transform hover:scale-[1.02]'
     : 'group flex items-center space-x-3 px-6 py-3 rounded-2xl transition-all duration-300 transform hover:scale-105';
@@ -23,9 +24,8 @@ const NavItem = ({ to, icon: Icon, label, isActive, mobile = false, onClick }) =
       className={`${baseClasses} ${isActive ? activeClasses : inactiveClasses}`}
     >
       <Icon
-        className={`w-${mobile ? 6 : 5} h-${mobile ? 6 : 5} transition-transform duration-200 ${
-          isActive && !mobile ? 'text-white' : ''
-        }`}
+        className={`w-${mobile ? 6 : 5} h-${mobile ? 6 : 5} transition-transform duration-200 ${isActive && !mobile ? 'text-white' : ''
+          }`}
       />
       <span className={`${mobile ? 'font-semibold text-lg' : 'font-semibold'}`}>{label}</span>
     </Link>
@@ -114,9 +114,8 @@ export const UserDashLayout = () => {
 
           {/* Mobile Dropdown */}
           <div
-            className={`md:hidden transition-all duration-500 ease-in-out ${
-              isMobileMenuOpen ? 'max-h-80 opacity-100 pb-6' : 'max-h-0 opacity-0'
-            } overflow-hidden`}
+            className={`md:hidden transition-all duration-500 ease-in-out ${isMobileMenuOpen ? 'max-h-80 opacity-100 pb-6' : 'max-h-0 opacity-0'
+              } overflow-hidden`}
           >
             <nav className="space-y-3 pt-4">
               <NavItem

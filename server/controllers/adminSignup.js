@@ -4,9 +4,9 @@ import config from "../config/config.js";
 
 export const adminSignup = async (req, res) => {
   try {
-    const { username, email, password, adminkey } = req.body;
+    const { username, email, password, adminKey } = req.body;
 
-    if (adminkey !== config.adminKey) {
+    if (adminKey !== config.adminKey) {
       return res.status(400).json({ success: false, message: "Cannot register as admin, invalid key" });
     }
 
@@ -17,6 +17,7 @@ export const adminSignup = async (req, res) => {
       email,
       password: hashPass,
       role: "admin"
+
     });
 
     await newAdmin.save();
@@ -25,6 +26,7 @@ export const adminSignup = async (req, res) => {
       message: "admin registered sucessfully",
       id: newAdmin.id,
       email: newAdmin.email,
+
     });
 
   } catch (error) {
