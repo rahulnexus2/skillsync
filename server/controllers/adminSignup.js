@@ -4,11 +4,8 @@ import config from "../config/config.js";
 
 export const adminSignup = async (req, res) => {
   try {
-    const { username, email, password, adminKey } = req.body;
+    const { username, email, password } = req.body;
 
-    if (adminKey !== config.adminKey) {
-      return res.status(400).json({ success: false, message: "Cannot register as admin, invalid key" });
-    }
 
     const hashPass = await bcrypt.hash(password, 10);
 

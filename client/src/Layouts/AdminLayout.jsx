@@ -35,9 +35,10 @@ const NavItem = ({ to, icon, label, isActive, mobile = false, onClick }) => {
 export const AdminDashLayout = () => {
   const location = useLocation();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [activeItem, setActiveItem] = useState(location.pathname || '/user/profile');
+  const [activeItem, setActiveItem] = useState(location.pathname || '/admin/dashboard');
 
   const navItems = [
+    { to: '/admin/dashboard', icon: User, label: 'Dashboard' },
     { to: '/admin/jobs', icon: Briefcase, label: 'Jobs' },
     { to: '/admin/quizes', icon: HelpCircle, label: 'Quizzes' },
     { to: '/admin/chatroom', icon: MessageCircle, label: 'Chatroom' }
@@ -81,14 +82,6 @@ export const AdminDashLayout = () => {
 
             {/* Desktop Navigation */}
             <nav className="hidden md:flex items-center space-x-2">
-              {/* Profile NavItem */}
-              <NavItem
-                to="/user/profile"
-                icon={User}
-                label="Profile"
-                isActive={activeItem === '/user/profile'}
-                onClick={() => handleNavClick('/user/profile')}
-              />
               {navItems.map((item) => (
                 <NavItem
                   key={item.to}
@@ -118,14 +111,6 @@ export const AdminDashLayout = () => {
               } overflow-hidden`}
           >
             <nav className="space-y-3 pt-4">
-              <NavItem
-                to="/user/profile"
-                icon={User}
-                label="Profile"
-                isActive={activeItem === '/user/profile'}
-                onClick={() => handleNavClick('/user/profile')}
-                mobile
-              />
               {navItems.map((item) => (
                 <NavItem
                   key={item.to}
@@ -154,14 +139,6 @@ export const AdminDashLayout = () => {
       {/* Mobile Bottom Nav */}
       <nav className="md:hidden relative z-10 bg-white/90 backdrop-blur-md shadow-2xl border-t border-white/30">
         <div className="flex justify-around py-2">
-          <NavItem
-            to="/user/profile"
-            icon={User}
-            label="Profile"
-            isActive={activeItem === '/user/profile'}
-            onClick={() => handleNavClick('/user/profile')}
-            mobile
-          />
           {navItems.map((item) => (
             <NavItem
               key={item.to}

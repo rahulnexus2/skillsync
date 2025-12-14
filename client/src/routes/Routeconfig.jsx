@@ -21,6 +21,7 @@ import AdminChat from "../Component/AdminChat";
 // User Components
 import UserAbout from "../Component/UserAbout";
 import UserChat from "../Component/UserChat";
+import UserJobs from "../Component/UserJobs";
 
 import JobCreation from "../JobCrud/JobCreation";
 import JobViewAll from "../JobCrud/JobViewAll";
@@ -51,17 +52,19 @@ export const Routeconfig = () => {
 
       {/* ---------------- User Protected Routes ---------------- */}
       <Route path="/user" element={<UserDashLayout />}>
-        <Route path="dashboard" element={<UserAbout />} /> {/* Replace with actual Dashboard Component */}
-        <Route path="profile" element={<UserAbout />} /> {/* Replace with Profile Component */}
-        <Route path="jobs" element={<Jobs />} />
+        {/* Redirect 'dashboard' and index to 'profile' or just have 'profile' */}
+        <Route index element={<Navigate to="profile" replace />} />
+        <Route path="profile" element={<UserAbout />} />
+        <Route path="jobs" element={<UserJobs />} />
         <Route path="quizes" element={<Quizes />} />
         <Route path="chatroom" element={<UserChat />} />
       </Route>
 
       {/* ---------------- Admin Protected Routes ---------------- */}
       <Route path="/admin" element={<AdminDashLayout />}>
-        <Route path="dashboard" element={<AdminAbout />} /> {/* Replace with actual Dashboard Component */}
-        <Route path="about" element={<AdminAbout />} />
+        <Route index element={<Navigate to="dashboard" replace />} />
+        <Route path="dashboard" element={<AdminAbout />} />
+        {/* Removed redundant 'about' route */}
         <Route path="quizes" element={<Quizes />} />
         <Route path="chatroom" element={<AdminChat />} />
 

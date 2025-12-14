@@ -16,7 +16,6 @@ const schema = z.object({
         .regex(/[a-z]/, "Password must contain at least one lowercase letter")
         .regex(/[0-9]/, "Password must contain at least one number")
         .regex(/[^A-Za-z0-9]/, "Password must contain at least one special character"),
-    adminKey: z.string().min(1, "Admin Key is required"), // Assuming Admin Key logic exists
 });
 
 export const AdminSignup = () => {
@@ -76,16 +75,7 @@ export const AdminSignup = () => {
                         />
                         {errors.password && <p className="text-red-500 text-xs mt-1">{errors.password.message}</p>}
                     </div>
-                    <div className="relative">
-                        <Key className="absolute top-3 left-3 text-gray-400" size={20} />
-                        <input
-                            {...register('adminKey')}
-                            type="password"
-                            placeholder="Admin Key"
-                            className="pl-10 appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-b-md focus:outline-none focus:ring-emerald-500 focus:border-emerald-500 focus:z-10 sm:text-sm"
-                        />
-                        {errors.adminKey && <p className="text-red-500 text-xs mt-1">{errors.adminKey.message}</p>}
-                    </div>
+
                 </div>
 
                 <div>
