@@ -19,7 +19,8 @@ export const AdminLogin = () => {
 
     const onSubmit = async (data) => {
         try {
-            await axiosInstance.post('/admin/login', data);
+            const response = await axiosInstance.post('/admin/login', data);
+            localStorage.setItem('adminToken', response.data.token);
             alert('Admin Login Successful!');
             navigate('/admin/dashboard');
         } catch (error) {

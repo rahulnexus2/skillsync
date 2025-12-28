@@ -19,9 +19,10 @@ export const UserLogin = () => {
 
     const onSubmit = async (data) => {
         try {
-            await axiosInstance.post('/users/login', data);
+            const response = await axiosInstance.post('/users/login', data);
+            localStorage.setItem('token', response.data.token);
             alert('Login Successful!');
-            navigate('/user/dashboard'); // Or wherever you want to redirect
+            navigate('/user/profile');
         } catch (error) {
             console.error(error);
             alert(error.response?.data?.message || 'Login Failed');
