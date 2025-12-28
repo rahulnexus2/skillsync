@@ -21,12 +21,12 @@ const userSchema = new Mongoose.Schema(
       required: true,
       trim: true,
     },
-    role:{
-    type:String,
-    enum:["user"],
-     default: "user"
+    role: {
+      type: String,
+      enum: ["user"],
+      default: "user"
 
-  },
+    },
 
     otp: {
       type: String,
@@ -39,6 +39,22 @@ const userSchema = new Mongoose.Schema(
     isVerified: {
       type: Boolean,
       default: false,
+    },
+
+    phone: {
+      type: String,
+      trim: true,
+      default: "",
+    },
+
+    education: {
+      type: String, // Keeping it simple for now, e.g., "B.Tech in CS"
+      default: "",
+    },
+
+    skills: {
+      type: [String],
+      default: [],
     },
 
     createdAt: {

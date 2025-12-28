@@ -1,6 +1,6 @@
 import { Outlet, Link, useLocation } from 'react-router-dom';
 import React, { useState, useEffect } from 'react';
-import { User, Briefcase, HelpCircle, MessageCircle, Menu, X, Sparkles } from 'lucide-react';
+import { User, Briefcase, HelpCircle, MessageCircle, Menu, X, Sparkles, Trophy } from 'lucide-react';
 
 // Reusable Navigation Item (handles Profile too)
 const NavItem = ({ to, icon, label, isActive, mobile = false, onClick }) => {

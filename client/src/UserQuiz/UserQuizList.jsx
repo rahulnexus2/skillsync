@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import axios from 'axios';
-import { Play, ClipboardList, Clock } from 'lucide-react';
+import { Play, ClipboardList, Clock, Trophy } from 'lucide-react';
 
 const UserQuizList = () => {
     const [quizzes, setQuizzes] = useState([]);
@@ -42,9 +42,16 @@ const UserQuizList = () => {
         <div className="space-y-6">
             <div className="flex justify-between items-center border-b pb-4">
                 <h2 className="text-3xl font-bold text-gray-800">Available Quizzes</h2>
-                <Link to="/user/quiz-history" className="text-indigo-600 hover:text-indigo-800 font-medium">
-                    View My History
-                </Link>
+                <div className="flex space-x-3">
+                    <Link to="/user/leaderboard" className="flex items-center px-4 py-2 bg-yellow-100 text-yellow-700 rounded-lg hover:bg-yellow-200 transition-colors font-medium">
+                        <Trophy className="w-4 h-4 mr-2" />
+                        Leaderboard
+                    </Link>
+                    <Link to="/user/quiz-history" className="flex items-center px-4 py-2 bg-indigo-100 text-indigo-700 rounded-lg hover:bg-indigo-200 transition-colors font-medium">
+                        <Clock className="w-4 h-4 mr-2" />
+                        History
+                    </Link>
+                </div>
             </div>
 
             {quizzes.length === 0 ? (

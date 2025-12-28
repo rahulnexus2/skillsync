@@ -13,6 +13,7 @@ import { viewJobById } from "../controllers/viewJobById.js";
 import { submitQuiz } from "../controllers/submitQuiz.js";
 import { getQuizAttempts } from "../controllers/getQuizAttempts.js";
 import { applyForJob } from "../controllers/applicationController.js";
+import { getLeaderboard } from "../controllers/getLeaderboard.js";
 
 const router = express.Router();
 
@@ -26,6 +27,14 @@ router.get("/jobs/:id", viewJobById);
 router.post("/submitquiz", userAuth, submitQuiz);
 router.get("/quizattempts", userAuth, getQuizAttempts);
 router.post("/apply/:jobId", userAuth, applyForJob);
+
+// Leaderboard
+router.get("/leaderboard", userAuth, getLeaderboard);
+
+// User Profile
+import { getUserProfile, updateUserProfile } from "../controllers/userProfileController.js";
+router.get("/profile", userAuth, getUserProfile);
+router.put("/profile", userAuth, updateUserProfile);
 
 
 

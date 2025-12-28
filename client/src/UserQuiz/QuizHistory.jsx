@@ -28,7 +28,12 @@ const QuizHistory = () => {
 
     return (
         <div className="space-y-6">
-            <h2 className="text-2xl font-bold text-gray-800 border-b pb-4">My Quiz Attempts</h2>
+            <div className="flex justify-between items-center border-b pb-4">
+                <h2 className="text-2xl font-bold text-gray-800">My Quiz Attempts</h2>
+                <Link to="/user/quizes" className="text-indigo-600 hover:underline">
+                    &larr; Back to Quizzes
+                </Link>
+            </div>
 
             {attempts.length === 0 ? (
                 <div className="text-center py-12 bg-gray-50 rounded-lg">

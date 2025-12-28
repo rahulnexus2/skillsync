@@ -25,6 +25,7 @@ import UserJobs from "../Component/UserJobs";
 import UserQuizList from "../UserQuiz/UserQuizList";
 import TakeQuiz from "../UserQuiz/TakeQuiz";
 import QuizHistory from "../UserQuiz/QuizHistory";
+import Leaderboard from "../UserQuiz/Leaderboard";
 
 import JobCreation from "../JobCrud/JobCreation";
 import JobViewAll from "../JobCrud/JobViewAll";
@@ -66,6 +67,7 @@ export const Routeconfig = () => {
         <Route path="quizes" element={<UserQuizList />} />
         <Route path="quizes/take/:id" element={<TakeQuiz />} />
         <Route path="quiz-history" element={<QuizHistory />} />
+        <Route path="leaderboard" element={<Leaderboard />} />
         <Route path="chatroom" element={<UserChat />} />
       </Route>
 
