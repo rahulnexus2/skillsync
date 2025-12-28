@@ -66,12 +66,7 @@ const Jobs = () => {
 
                 {/* 3. Update Job (Dynamic Route: /admin/jobs/update/1) */}
                 {/* Note: In a real app, this link is usually on the ViewAll table */}
-                <JobNavButton
-                    to="update/1"
-                    icon={Edit}
-                    label="Update (Demo)"
-                    isActive={isSubRouteActive('update')}
-                />
+
             </nav>
 
             {/* 🔑 THIS IS WHERE THE NESTED CRUD COMPONENTS ARE RENDERED (Level 3) */}

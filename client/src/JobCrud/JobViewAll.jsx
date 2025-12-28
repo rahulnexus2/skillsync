@@ -26,7 +26,13 @@ const JobViewAll = () => {
         if (!window.confirm("Are you sure you want to delete this job?")) return;
 
         try {
-            await axios.delete(`http://localhost:8000/api/v1/admin/deletejob/${jobId}`, { withCredentials: true });
+            const token = localStorage.getItem('adminToken');
+            await axios.delete(`http://localhost:8000/api/v1/admin/deletejob/${jobId}`, {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                },
+                withCredentials: true
+            });
             setJobs(prev => prev.filter(job => job._id !== jobId));
             alert("Job deleted successfully");
         } catch (err) {
@@ -66,6 +72,7 @@ const JobViewAll = () => {
                         </div>
 
                         <div className="flex space-x-3 mt-4 md:mt-0">
+
                             <Link
                                 to={`update/${job._id}`}
                                 className="flex items-center space-x-2 px-4 py-2 bg-blue-100 text-blue-600 rounded-lg hover:bg-blue-200 transition-colors"

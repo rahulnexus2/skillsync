@@ -50,7 +50,7 @@ const JobUpdate = () => {
 
             await axios.put(`http://localhost:8000/api/v1/admin/updatejob/${jobId}`, formattedData, {
                 headers: {
-                    Authorization: `Bearer ${localStorage.getItem('token')}`
+                    Authorization: `Bearer ${localStorage.getItem('adminToken')}`
                 },
                 withCredentials: true
             });

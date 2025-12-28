@@ -22,11 +22,20 @@ import AdminChat from "../Component/AdminChat";
 import UserAbout from "../Component/UserAbout";
 import UserChat from "../Component/UserChat";
 import UserJobs from "../Component/UserJobs";
+import UserQuizList from "../UserQuiz/UserQuizList";
+import TakeQuiz from "../UserQuiz/TakeQuiz";
+import QuizHistory from "../UserQuiz/QuizHistory";
 
 import JobCreation from "../JobCrud/JobCreation";
 import JobViewAll from "../JobCrud/JobViewAll";
 import JobDetails from "../JobCrud/JobDetails";
 import JobUpdate from "../JobCrud/JobUpdate"
+
+// Quiz CRUD Components
+import QuizCreation from "../QuizCrud/QuizCreation";
+import QuizViewAll from "../QuizCrud/QuizViewAll";
+import QuizDetails from "../QuizCrud/QuizDetails";
+import QuizUpdate from "../QuizCrud/QuizUpdate";
 
 export const Routeconfig = () => {
   return (
@@ -46,8 +55,6 @@ export const Routeconfig = () => {
         <Route index element={<Navigate to="signup" replace />} />
         <Route path="signup" element={<AdminSignup />} />
         <Route path="login" element={<AdminLogin />} />
-
-
       </Route>
 
       {/* ---------------- User Protected Routes ---------------- */}
@@ -56,7 +63,9 @@ export const Routeconfig = () => {
         <Route index element={<Navigate to="profile" replace />} />
         <Route path="profile" element={<UserAbout />} />
         <Route path="jobs" element={<UserJobs />} />
-        <Route path="quizes" element={<Quizes />} />
+        <Route path="quizes" element={<UserQuizList />} />
+        <Route path="quizes/take/:id" element={<TakeQuiz />} />
+        <Route path="quiz-history" element={<QuizHistory />} />
         <Route path="chatroom" element={<UserChat />} />
       </Route>
 
@@ -64,22 +73,24 @@ export const Routeconfig = () => {
       <Route path="/admin" element={<AdminDashLayout />}>
         <Route index element={<Navigate to="dashboard" replace />} />
         <Route path="dashboard" element={<AdminAbout />} />
-        {/* Removed redundant 'about' route */}
-        <Route path="quizes" element={<Quizes />} />
-        <Route path="chatroom" element={<AdminChat />} />
 
+        {/* Quiz Routes with Nested Navigation */}
+        <Route path="quizes" element={<Quizes />}>
+          <Route index element={<QuizViewAll />} />
+          <Route path="create" element={<QuizCreation />} />
+          <Route path="view/:id" element={<QuizDetails />} />
+          <Route path="update/:id" element={<QuizUpdate />} />
+        </Route>
+
+        <Route path="chatroom" element={<AdminChat />} />
 
         <Route path="jobs" element={<Jobs />} >
           <Route index element={<JobViewAll />} />
           <Route path="create" element={<JobCreation />} />
           <Route path="view/:jobId" element={<JobDetails />} />
           <Route path="update/:jobId" element={<JobUpdate />} />
+
         </Route>
-
-
-
-        {/*  <Route path="jobs/createjob" element={<CreateJobLayout/>}></Route>
-        <Route path="jobs/viewjob" element={<ViewCreateJobLayout/>}></Route> */}
       </Route>
 
       {/* Catch-all redirect */}

@@ -25,7 +25,12 @@ const UserJobs = () => {
 
     const handleApply = async (jobId) => {
         try {
-            await axios.post(`http://localhost:8000/api/v1/users/apply/${jobId}`, {}, { withCredentials: true });
+            await axios.post(`http://localhost:8000/api/v1/users/apply/${jobId}`, {}, {
+                headers: {
+                    Authorization: `Bearer ${localStorage.getItem('token')}`
+                },
+                withCredentials: true
+            });
             alert('Applied successfully!');
         } catch (err) {
             alert(err.response?.data?.message || 'Failed to apply');

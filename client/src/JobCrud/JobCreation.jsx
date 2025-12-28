@@ -36,7 +36,7 @@ const JobCreation = () => {
 
             await axios.post('http://localhost:8000/api/v1/admin/createjob', formattedData, {
                 headers: {
-                    Authorization: `Bearer ${localStorage.getItem('token')}`
+                    Authorization: `Bearer ${localStorage.getItem('adminToken')}`
                 },
                 withCredentials: true
             });
