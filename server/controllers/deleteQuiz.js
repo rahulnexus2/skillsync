@@ -3,6 +3,7 @@ import Quiz from '../models/QuizModel.js';
 export const deleteQuiz = async (req, res) => {
     try {
         const { id } = req.params;
+        console.log(`[DeleteQuiz] Request received for ID: ${id}`);
 
         const quiz = await Quiz.findById(id);
 
@@ -12,9 +13,8 @@ export const deleteQuiz = async (req, res) => {
             });
         }
 
-        // Soft delete - set isActive to false
-        quiz.isActive = false;
-        await quiz.save();
+        // Hard delete
+        await Quiz.findByIdAndDelete(id);
 
         res.status(200).json({
             message: "Quiz deleted successfully"

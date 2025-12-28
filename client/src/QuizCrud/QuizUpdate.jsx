@@ -1,14 +1,20 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useForm, useFieldArray } from "react-hook-form";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import axios from 'axios';
-import { Plus, Trash2, Save } from 'lucide-react';
+import { Plus, Trash2, Save, ArrowLeft } from 'lucide-react';
 
-const QuizCreation = () => {
+const QuizUpdate = () => {
+    const { id } = useParams();
+    const navigate = useNavigate();
+    const [loading, setLoading] = useState(true);
+    const [isSubmitting, setIsSubmitting] = useState(false);
+
     const {
         register,
         handleSubmit,
         control,
+        reset,
         setError,
         watch,
         formState: { errors },
@@ -16,13 +22,7 @@ const QuizCreation = () => {
         defaultValues: {
             title: '',
             description: '',
-            questions: [
-                {
-                    questionText: '',
-                    options: ['', '', '', ''],
-                    correctAnswer: ''
-                }
-            ]
+            questions: []
         }
     });
 
@@ -31,16 +31,42 @@ const QuizCreation = () => {
         name: "questions"
     });
 
-    const navigate = useNavigate();
-    const [isSubmitting, setIsSubmitting] = useState(false);
+    useEffect(() => {
+        const fetchQuiz = async () => {
+            try {
+                const token = localStorage.getItem('adminToken');
+                const res = await axios.get(
+                    `http://localhost:8000/api/v1/admin/viewquiz/${id}`,
+                    {
+                        headers: { Authorization: `Bearer ${token}` }
+                    }
+                );
+
+                // Populate form with fetched data
+                reset({
+                    title: res.data.quiz.title,
+                    description: res.data.quiz.description,
+                    questions: res.data.quiz.questions
+                });
+            } catch (err) {
+                console.error("Failed to fetch quiz", err);
+                alert("Failed to load quiz details");
+                navigate('/admin/quizes');
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        if (id) fetchQuiz();
+    }, [id, reset, navigate]);
 
     const onSubmit = async (data) => {
         try {
             setIsSubmitting(true);
             const token = localStorage.getItem('adminToken');
 
-            const res = await axios.post(
-                "http://localhost:8000/api/v1/admin/createquiz",
+            const res = await axios.put(
+                `http://localhost:8000/api/v1/admin/updatequiz/${id}`,
                 data,
                 {
                     headers: {
@@ -75,9 +101,24 @@ const QuizCreation = () => {
         });
     };
 
+    if (loading) return (
+        <div className="flex justify-center items-center h-64">
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600"></div>
+        </div>
+    );
+
     return (
         <div className="max-w-4xl mx-auto">
-            <h2 className="text-3xl font-bold text-gray-800 mb-6">📝 Create New Quiz</h2>
+            <div className="mb-6 flex items-center justify-between">
+                <h2 className="text-3xl font-bold text-gray-800">✏️ Edit Quiz</h2>
+                <button
+                    type="button"
+                    onClick={() => navigate('/admin/quizes')}
+                    className="text-gray-600 hover:text-gray-900 flex items-center gap-2"
+                >
+                    <ArrowLeft className="w-5 h-5" /> Cancel
+                </button>
+            </div>
 
             <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
                 {/* Quiz Title */}
@@ -227,17 +268,19 @@ const QuizCreation = () => {
                 )}
 
                 {/* Submit Button */}
-                <button
-                    type="submit"
-                    disabled={isSubmitting}
-                    className="w-full flex items-center justify-center space-x-2 px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-semibold rounded-lg hover:from-blue-700 hover:to-indigo-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                    <Save className="w-5 h-5" />
-                    <span>{isSubmitting ? 'Creating Quiz...' : 'Create Quiz'}</span>
-                </button>
+                <div className="flex items-center gap-4">
+                    <button
+                        type="submit"
+                        disabled={isSubmitting}
+                        className="flex-1 flex items-center justify-center space-x-2 px-6 py-3 bg-gradient-to-r from-green-600 to-teal-600 text-white font-semibold rounded-lg hover:from-green-700 hover:to-teal-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                        <Save className="w-5 h-5" />
+                        <span>{isSubmitting ? 'Updating...' : 'Update Quiz'}</span>
+                    </button>
+                </div>
             </form>
         </div>
     );
 };
 
-export default QuizCreation;
+export default QuizUpdate;
