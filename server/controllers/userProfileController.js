@@ -1,6 +1,7 @@
 import User from "../models/UserModel.js";
 import QuizAttempt from "../models/QuizAttemptModel.js";
 import Application from "../models/ApplicationModel.js";
+import Job from "../models/JobModel.js"; // Ensure Job model is registered
 
 // Get User Profile with Aggregated Stats
 export const getUserProfile = async (req, res) => {
