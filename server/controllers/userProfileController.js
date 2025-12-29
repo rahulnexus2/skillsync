@@ -6,15 +6,19 @@ import Job from "../models/JobModel.js"; // Ensure Job model is registered
 // Get User Profile with Aggregated Stats
 export const getUserProfile = async (req, res) => {
     try {
+        console.log("-> getUserProfile called for user:", req.user._id);
         const userId = req.user._id;
 
         // 1. Fetch Basic User Info
         const user = await User.findById(userId).select("-password -otp -otpExpires");
         if (!user) {
+            console.log("User not found in DB");
             return res.status(404).json({ message: "User not found" });
         }
+        console.log("1. User fetched:", user.username);
 
         // 2. Aggregate Quiz Stats
+        console.log("2. Starting Quiz Stats aggregation...");
         const quizStats = await QuizAttempt.aggregate([
             { $match: { userId: userId } },
             {
@@ -26,16 +30,24 @@ export const getUserProfile = async (req, res) => {
                 }
             }
         ]);
+        console.log("Quiz Stats result:", quizStats);
 
         const stats = quizStats.length > 0 ? quizStats[0] : { totalScore: 0, quizzesTaken: 0, averagePercentage: 0 };
 
         // 3. Fetch Job Applications
+        console.log("3. Fetching Applications...");
+        // Debug: Check if Application model works without populate first
+        // const rawApps = await Application.find({ userId: userId });
+        // console.log("Raw Apps count:", rawApps.length);
+
         const applications = await Application.find({ userId: userId })
             .populate({
                 path: 'jobId',
                 select: 'jobTitle company location jobType'
             })
             .sort({ appliedAt: -1 });
+
+        console.log("Applications fetched:", applications.length);
 
         // Combine everything
         res.status(200).json({
@@ -47,9 +59,10 @@ export const getUserProfile = async (req, res) => {
             },
             applications
         });
+        console.log("-> Response sent successfully");
 
     } catch (error) {
-        console.error("Profile Fetch Error:", error);
+        console.error("CRITICAL Profile Fetch Error:", error);
         res.status(500).json({ message: "Server Error", error: error.message });
     }
 };
