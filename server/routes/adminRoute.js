@@ -18,7 +18,7 @@ import { viewQuiz } from "../controllers/viewQuiz.js";
 import { viewQuizById } from "../controllers/viewQuizById.js";
 import { updateQuiz } from "../controllers/updateQuiz.js";
 import { deleteQuiz } from "../controllers/deleteQuiz.js";
-import { getAdminStats } from "../controllers/adminProfileController.js";
+import { getAdminStats, updateAdminProfile } from "../controllers/adminProfileController.js";
 import { getAdminApplications, updateApplicationStatus } from "../controllers/applicationController.js";
 
 const router = express.Router();
@@ -42,6 +42,7 @@ router.delete("/deletequiz/:id", adminAuth, deleteQuiz);
 
 // Admin Profile & Stats
 router.get("/stats", adminAuth, getAdminStats);
+router.put("/update-profile", adminAuth, updateAdminProfile);
 
 // Application Management
 router.get("/applications", adminAuth, getAdminApplications);

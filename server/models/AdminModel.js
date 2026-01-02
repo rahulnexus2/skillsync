@@ -30,11 +30,15 @@ const adminSchema = new Mongoose.Schema({
     default: "admin"
 
   },
+  phoneNumber: {
+    type: String,
+    default: ""
+  },
   profilePicture: {
     type: String,
     default: ""
   }
-})
+}, { timestamps: true })
 
 const Admin = Mongoose.model("Admin", adminSchema) || Mongoose.models.Admin
 

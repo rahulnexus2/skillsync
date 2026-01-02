@@ -13,8 +13,8 @@ export const adminSignup = async (req, res) => {
       username,
       email,
       password: hashPass,
-      role: "admin"
-
+      role: "admin",
+      phoneNumber: req.body.phoneNumber || ""
     });
 
     await newAdmin.save();
