@@ -57,6 +57,12 @@ const userSchema = new Mongoose.Schema(
       default: [],
     },
 
+    projects: [{
+      name: { type: String, required: true },
+      description: { type: String, required: true },
+      link: { type: String, default: "" }
+    }],
+
     createdAt: {
       type: Date,
       default: Date.now,

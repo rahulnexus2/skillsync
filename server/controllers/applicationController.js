@@ -42,7 +42,8 @@ export const getAdminApplications = async (req, res) => {
         // Find applications for these jobs
         const applications = await Application.find({ jobId: { $in: jobIds } })
             .populate("jobId", "jobTitle company")
-            .populate("userId", "name email") // Assuming User model has name & email
+            .populate("jobId", "jobTitle company")
+            .populate("userId", "username email education skills projects") // Populating username, education, skills, and projects
             .sort({ appliedAt: -1 });
 
         res.status(200).json(applications);

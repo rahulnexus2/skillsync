@@ -80,6 +80,7 @@ export const updateUserProfile = async (req, res) => {
                     phone,
                     education,
                     skills, // Expecting array of strings
+                    projects: req.body.projects || [], // Expecting array of project objects
                 }
             },
             { new: true, runValidators: true }
