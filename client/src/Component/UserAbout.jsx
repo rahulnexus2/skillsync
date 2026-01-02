@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { User, Mail, Phone, Book, Code, Edit, Trophy, Briefcase, Play, ExternalLink } from 'lucide-react';
+import { User, Mail, Phone, Book, Code, Edit, Trophy, Briefcase, Play, ExternalLink, XCircle } from 'lucide-react';
 
 const UserAbout = () => {
   const [profile, setProfile] = useState(null);
@@ -9,7 +9,8 @@ const UserAbout = () => {
   const [formData, setFormData] = useState({
     phone: '',
     education: '',
-    skills: ''
+    skills: '',
+    projects: []
   });
 
   useEffect(() => {
@@ -26,7 +27,8 @@ const UserAbout = () => {
       setFormData({
         phone: res.data.user.phone || '',
         education: res.data.user.education || '',
-        skills: res.data.user.skills ? res.data.user.skills.join(', ') : ''
+        skills: res.data.user.skills ? res.data.user.skills.join(', ') : '',
+        projects: res.data.user.projects || []
       });
     } catch (err) {
       console.error("Failed to load profile", err);
@@ -56,6 +58,24 @@ const UserAbout = () => {
     }
   };
 
+  const handleAddProject = () => {
+    setFormData({
+      ...formData,
+      projects: [...formData.projects, { name: '', description: '', link: '' }]
+    });
+  };
+
+  const handleProjectChange = (index, field, value) => {
+    const updatedProjects = [...formData.projects];
+    updatedProjects[index][field] = value;
+    setFormData({ ...formData, projects: updatedProjects });
+  };
+
+  const handleRemoveProject = (index) => {
+    const updatedProjects = formData.projects.filter((_, i) => i !== index);
+    setFormData({ ...formData, projects: updatedProjects });
+  };
+
   if (loading) return <div className="p-10 text-center">Loading Profile...</div>;
   if (!profile) return <div className="p-10 text-center text-red-500">Error loading profile data</div>;
 
@@ -67,7 +87,7 @@ const UserAbout = () => {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
 
         {/* 1. Profile Info Card */}
-        <div className="lg:col-span-2 bg-white rounded-xl shadow-lg border border-gray-100 p-6">
+        <div className="lg:col-span-2 bg-white rounded-xl shadow-lg border border-gray-100 p-4 md:p-6">
           <div className="flex justify-between items-start mb-6">
             <h2 className="text-2xl font-bold text-gray-800 flex items-center">
               <User className="w-6 h-6 mr-2 text-indigo-600" />
@@ -84,6 +104,7 @@ const UserAbout = () => {
 
           {!editMode ? (
             <div className="space-y-4">
+              {/* Basic Info */}
               <div className="flex items-center space-x-3 text-gray-600">
                 <span className="font-semibold w-24">Name:</span>
                 <span className="text-gray-900">{user.username}</span>
@@ -103,6 +124,8 @@ const UserAbout = () => {
                 <span className="font-semibold w-20">Education:</span>
                 <span className="text-gray-900">{user.education || 'Not Set'}</span>
               </div>
+
+              {/* Skills Display */}
               <div className="flex flex-wrap gap-2 pt-2">
                 <div className="flex items-center w-full text-gray-600 mb-1">
                   <Code className="w-4 h-4 mr-2" />
@@ -116,6 +139,33 @@ const UserAbout = () => {
                   ))
                 ) : (
                   <span className="text-gray-400 italic">No skills listed</span>
+                )}
+              </div>
+
+              {/* Projects Display */}
+              <div className="pt-4 border-t border-gray-100">
+                <div className="flex items-center text-gray-600 mb-3">
+                  <Briefcase className="w-4 h-4 mr-2" />
+                  <span className="font-semibold text-lg">Projects</span>
+                </div>
+                {user.projects && user.projects.length > 0 ? (
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    {user.projects.map((proj, i) => (
+                      <div key={i} className="bg-gray-50 p-4 rounded-lg border border-gray-100">
+                        <h4 className="font-bold text-gray-800 flex justify-between items-start">
+                          {proj.name}
+                          {proj.link && (
+                            <a href={proj.link} target="_blank" rel="noopener noreferrer" className="text-indigo-500 hover:text-indigo-700">
+                              <ExternalLink className="w-4 h-4" />
+                            </a>
+                          )}
+                        </h4>
+                        <p className="text-sm text-gray-600 mt-1">{proj.description}</p>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-gray-400 italic text-sm">No projects added yet.</p>
                 )}
               </div>
             </div>
@@ -151,7 +201,56 @@ const UserAbout = () => {
                   placeholder="React, Node.js, Python..."
                 />
               </div>
-              <div className="flex justify-end space-x-3 pt-2">
+
+              {/* Projects Edit Section */}
+              <div className="pt-4 border-t border-gray-100">
+                <label className="block text-sm font-medium text-gray-700 mb-3">Projects</label>
+                {formData.projects.map((proj, index) => (
+                  <div key={index} className="bg-gray-50 p-4 rounded-lg border border-gray-200 mb-3 relative">
+                    <button
+                      type="button"
+                      onClick={() => handleRemoveProject(index)}
+                      className="absolute top-2 right-2 text-red-500 hover:text-red-700"
+                      title="Remove Project"
+                    >
+                      <XCircle className="w-5 h-5" />
+                    </button>
+                    <div className="grid grid-cols-1 gap-3">
+                      <input
+                        type="text"
+                        placeholder="Project Name"
+                        value={proj.name}
+                        onChange={(e) => handleProjectChange(index, 'name', e.target.value)}
+                        className="w-full px-3 py-2 border rounded focus:ring-1 focus:ring-indigo-500 text-sm"
+                        required
+                      />
+                      <textarea
+                        placeholder="Description (max 200 chars)"
+                        value={proj.description}
+                        onChange={(e) => handleProjectChange(index, 'description', e.target.value)}
+                        className="w-full px-3 py-2 border rounded focus:ring-1 focus:ring-indigo-500 text-sm h-20 resize-none"
+                        required
+                      />
+                      <input
+                        type="url"
+                        placeholder="Project Link (User Hosted)"
+                        value={proj.link}
+                        onChange={(e) => handleProjectChange(index, 'link', e.target.value)}
+                        className="w-full px-3 py-2 border rounded focus:ring-1 focus:ring-indigo-500 text-sm"
+                      />
+                    </div>
+                  </div>
+                ))}
+                <button
+                  type="button"
+                  onClick={handleAddProject}
+                  className="mt-2 text-sm text-indigo-600 hover:text-indigo-800 font-medium flex items-center"
+                >
+                  + Add Project
+                </button>
+              </div>
+
+              <div className="flex justify-end space-x-3 pt-4">
                 <button
                   type="button"
                   onClick={() => setEditMode(false)}
@@ -171,7 +270,7 @@ const UserAbout = () => {
         </div>
 
         {/* 2. Stats Card */}
-        <div className="bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl shadow-lg p-6 text-white flex flex-col justify-between">
+        <div className="bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl shadow-lg p-4 md:p-6 text-white flex flex-col justify-between">
           <div>
             <h3 className="text-xl font-bold flex items-center mb-4 text-indigo-50">
               <Trophy className="w-5 h-5 mr-2" />
@@ -199,7 +298,7 @@ const UserAbout = () => {
 
       {/* 3. Job Applications */}
       <div className="bg-white rounded-xl shadow-lg border border-gray-100 overflow-hidden">
-        <div className="p-6 border-b border-gray-100">
+        <div className="p-4 md:p-6 border-b border-gray-100">
           <h2 className="text-2xl font-bold text-gray-800 flex items-center">
             <Briefcase className="w-6 h-6 mr-2 text-indigo-600" />
             Job Applications
