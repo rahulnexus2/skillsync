@@ -79,7 +79,7 @@ const UserAbout = () => {
   if (loading) return <div className="p-10 text-center">Loading Profile...</div>;
   if (!profile) return <div className="p-10 text-center text-red-500">Error loading profile data</div>;
 
-  const { user, stats, applications } = profile;
+  const { user, applications } = profile;
 
   return (
     <div className="max-w-5xl mx-auto space-y-8">
@@ -269,31 +269,7 @@ const UserAbout = () => {
           )}
         </div>
 
-        {/* 2. Stats Card */}
-        <div className="bg-gradient-to-br from-indigo-500 to-purple-600 rounded-xl shadow-lg p-4 md:p-6 text-white flex flex-col justify-between">
-          <div>
-            <h3 className="text-xl font-bold flex items-center mb-4 text-indigo-50">
-              <Trophy className="w-5 h-5 mr-2" />
-              Performance Stats
-            </h3>
-            <div className="space-y-6">
-              <div className="text-center bg-white/10 rounded-lg p-4 backdrop-blur-sm">
-                <span className="block text-4xl font-extrabold">{stats.totalScore}</span>
-                <span className="text-indigo-100 text-sm">Total Quiz Score</span>
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div className="text-center bg-white/10 rounded-lg p-3">
-                  <span className="block text-2xl font-bold">{stats.quizzesTaken}</span>
-                  <span className="text-xs text-indigo-100">Quizzes Taken</span>
-                </div>
-                <div className="text-center bg-white/10 rounded-lg p-3">
-                  <span className="block text-2xl font-bold">{stats.averagePercentage}%</span>
-                  <span className="text-xs text-indigo-100">Avg. Score</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
+        {/* Stats Removed */}
       </div>
 
       {/* 3. Job Applications */}

@@ -19,20 +19,7 @@ const JobCreation = () => {
                 skills: data.skills.split(',').map(skill => skill.trim())
             };
 
-            const token = localStorage.getItem('adminToken'); // Assuming token is stored here? 
-            // Better to rely on cookie auth since backend sets cors credentials: true.
-            // But verify if adminAuth uses header? 
-            // adminAuth.js uses Authorization: Bearer <token>.
-            // We need to send the token. 
-            // Wait, previous axios calls in AdminAbout used withCredentials: true, implying cookies?
-            // Checking adminAuth.js again:
-            // "const authHeader = req.headers.authorization;" -> It checks header.
-            // So we MUST send header.
-            // Where is the token? 
-            // In AdminLogin.jsx (I should check where it saves token). 
-            // I'll assume localStorage.getItem('token') or 'adminToken'.
-            // Let's check AdminLogin to be sure. I will err on side of caution and check it.
-            // But for now, let's assume 'token'.
+            // Token is retrieved directly in axios call
 
             await axios.post('http://localhost:8000/api/v1/admin/createjob', formattedData, {
                 headers: {

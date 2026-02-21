@@ -6,39 +6,38 @@ import { Briefcase, MapPin, Calendar, FileText } from 'lucide-react';
 
 const JobUpdate = () => {
     const { jobId } = useParams();
-    const { register, handleSubmit, setValue, formState: { errors } } = useForm();
+    const { register, handleSubmit, setValue } = useForm();
     const navigate = useNavigate();
     const [loading, setLoading] = useState(true);
     const [isSubmitting, setIsSubmitting] = useState(false);
 
     useEffect(() => {
-        fetchJob();
-    }, [jobId]);
+        const fetchJob = async () => {
+            try {
+                const res = await axios.get(`http://localhost:8000/api/v1/admin/viewjob/${jobId}`);
+                const job = res.data;
 
-    const fetchJob = async () => {
-        try {
-            const res = await axios.get(`http://localhost:8000/api/v1/admin/viewjob/${jobId}`);
-            const job = res.data;
+                // Populate form
+                setValue('jobTitle', job.jobTitle);
+                setValue('company', job.company);
+                setValue('location', job.location);
+                setValue('jobType', job.jobType);
+                setValue('jobPost', job.jobPost);
+                setValue('jobDescription', job.jobDescription);
+                setValue('skills', job.skills.join(', '));
+                if (job.deadline) {
+                    setValue('deadline', new Date(job.deadline).toISOString().split('T')[0]);
+                }
 
-            // Populate form
-            setValue('jobTitle', job.jobTitle);
-            setValue('company', job.company);
-            setValue('location', job.location);
-            setValue('jobType', job.jobType);
-            setValue('jobPost', job.jobPost);
-            setValue('jobDescription', job.jobDescription);
-            setValue('skills', job.skills.join(', '));
-            if (job.deadline) {
-                setValue('deadline', new Date(job.deadline).toISOString().split('T')[0]);
+                setLoading(false);
+            } catch (err) {
+                console.error(err);
+                alert('Failed to fetch job details');
+                navigate('/admin/jobs');
             }
-
-            setLoading(false);
-        } catch (err) {
-            console.error(err);
-            alert('Failed to fetch job details');
-            navigate('/admin/jobs');
-        }
-    };
+        };
+        fetchJob();
+    }, [jobId, setValue, navigate]);
 
     const onSubmit = async (data) => {
         setIsSubmitting(true);

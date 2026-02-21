@@ -15,28 +15,17 @@ import { AdminLogin } from "../pages/AdminLogin";
 // Admin Components
 import AdminAbout from "../Component/AdminAbout";
 import Jobs from "../Component/Jobs";
-import Quizes from "../Component/Quizes";
 import AdminChat from "../Component/AdminChat";
 
 // User Components
 import UserAbout from "../Component/UserAbout";
 import UserChat from "../Component/UserChat";
+import ResumeScorer from "../Component/ResumeScorer";
 import UserJobs from "../Component/UserJobs";
-import UserQuizList from "../UserQuiz/UserQuizList";
-import TakeQuiz from "../UserQuiz/TakeQuiz";
-import QuizHistory from "../UserQuiz/QuizHistory";
-import Leaderboard from "../UserQuiz/Leaderboard";
-
-import JobCreation from "../JobCrud/JobCreation";
+import JobUpdate from "../JobCrud/JobUpdate";
 import JobViewAll from "../JobCrud/JobViewAll";
+import JobCreation from "../JobCrud/JobCreation";
 import JobDetails from "../JobCrud/JobDetails";
-import JobUpdate from "../JobCrud/JobUpdate"
-
-// Quiz CRUD Components
-import QuizCreation from "../QuizCrud/QuizCreation";
-import QuizViewAll from "../QuizCrud/QuizViewAll";
-import QuizDetails from "../QuizCrud/QuizDetails";
-import QuizUpdate from "../QuizCrud/QuizUpdate";
 
 export const Routeconfig = () => {
   return (
@@ -64,11 +53,8 @@ export const Routeconfig = () => {
         <Route index element={<Navigate to="profile" replace />} />
         <Route path="profile" element={<UserAbout />} />
         <Route path="jobs" element={<UserJobs />} />
-        <Route path="quizes" element={<UserQuizList />} />
-        <Route path="quizes/take/:id" element={<TakeQuiz />} />
-        <Route path="quiz-history" element={<QuizHistory />} />
-        <Route path="leaderboard" element={<Leaderboard />} />
         <Route path="chatroom" element={<UserChat />} />
+        <Route path="resume-scorer" element={<ResumeScorer />} />
       </Route>
 
       {/* ---------------- Admin Protected Routes ---------------- */}
@@ -76,13 +62,7 @@ export const Routeconfig = () => {
         <Route index element={<Navigate to="dashboard" replace />} />
         <Route path="dashboard" element={<AdminAbout />} />
 
-        {/* Quiz Routes with Nested Navigation */}
-        <Route path="quizes" element={<Quizes />}>
-          <Route index element={<QuizViewAll />} />
-          <Route path="create" element={<QuizCreation />} />
-          <Route path="view/:id" element={<QuizDetails />} />
-          <Route path="update/:id" element={<QuizUpdate />} />
-        </Route>
+        {/* Quiz routes removed */}
 
         <Route path="chatroom" element={<AdminChat />} />
 

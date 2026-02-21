@@ -7,7 +7,7 @@ export const adminLogin = async (req, res) => {
       {
         id: admin._id,
         email:admin.email,
-        password:admin.password,
+        
         role:admin.role
       },
       process.env.JWT_SECRET,

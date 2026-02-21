@@ -1,6 +1,6 @@
 import { Outlet, Link, useLocation } from 'react-router-dom';
 import React, { useState, useEffect } from 'react';
-import { User, Briefcase, HelpCircle, MessageCircle, Menu, X, Sparkles } from 'lucide-react';
+import { User, Briefcase, MessageCircle, Menu, X, Sparkles } from 'lucide-react';
 
 // Reusable Navigation Item (handles Profile too)
 const NavItem = ({ to, icon, label, isActive, mobile = false, onClick }) => {
@@ -40,7 +40,6 @@ export const AdminDashLayout = () => {
   const navItems = [
     { to: '/admin/dashboard', icon: User, label: 'Dashboard' },
     { to: '/admin/jobs', icon: Briefcase, label: 'Jobs' },
-    { to: '/admin/quizes', icon: HelpCircle, label: 'Quizzes' },
     { to: '/admin/chatroom', icon: MessageCircle, label: 'Chatroom' }
   ];
 

@@ -6,28 +6,24 @@ export const adminLoginAuth = async (req, res, next) => {
     const { email, password } = req.body;
 
     const existingAdmin = await Admin.findOne({ email });
-    console.log(existingAdmin)
 
     if (!existingAdmin) {
-      return res.status(400).json({ message: "email is not registered" });
+      return res.status(400).json({ message: "Email not registered" });
     }
 
-    const isMatch =await bcrypt.compare(password, existingAdmin.password);
-    console.log(isMatch)
+    const isMatch = await bcrypt.compare(password, existingAdmin.password);
+
     if (!isMatch) {
-      return res.status(401).json({ message: "invalid email or password" });
+      return res.status(401).json({ message: "Invalid email or password" });
     }
 
-    req.user = existingAdmin;
+    req.user = existingAdmin; // ✅ keep this
 
     next();
-    
   } catch (error) {
-
     res.status(500).json({
-      message: "server error",
+      message: "Server error",
       error: error.message,
-
     });
   }
 };

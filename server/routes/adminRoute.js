@@ -13,11 +13,6 @@ import { viewJobById } from "../controllers/viewJobById.js"
 import { updateJob } from "../controllers/updateJob.js";
 import { deleteJob } from "../controllers/deleteJob.js";
 
-import { createQuiz } from "../controllers/createQuiz.js";
-import { viewQuiz } from "../controllers/viewQuiz.js";
-import { viewQuizById } from "../controllers/viewQuizById.js";
-import { updateQuiz } from "../controllers/updateQuiz.js";
-import { deleteQuiz } from "../controllers/deleteQuiz.js";
 import { getAdminStats, updateAdminProfile } from "../controllers/adminProfileController.js";
 import { getAdminApplications, updateApplicationStatus } from "../controllers/applicationController.js";
 
@@ -33,12 +28,10 @@ router.get("/viewjob/:id", viewJobById);
 router.put("/updatejob/:id", adminAuth, updateJob);
 router.delete("/deletejob/:id", adminAuth, deleteJob);
 
-// Quiz routes
-router.post("/createquiz", adminAuth, createQuiz);
-router.get("/viewquiz", adminAuth, viewQuiz);
-router.get("/viewquiz/:id", adminAuth, viewQuizById);
-router.put("/updatequiz/:id", adminAuth, updateQuiz);
-router.delete("/deletequiz/:id", adminAuth, deleteQuiz);
+// Chat routes
+import { getUsersForChat, getAdminChatHistory } from "../controllers/chatController.js";
+router.get("/chat/users", adminAuth, getUsersForChat);
+router.get("/chat/:userId", adminAuth, getAdminChatHistory);
 
 // Admin Profile & Stats
 router.get("/stats", adminAuth, getAdminStats);

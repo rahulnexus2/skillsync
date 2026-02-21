@@ -1,7 +1,6 @@
 import User from "../models/UserModel.js";
-import QuizAttempt from "../models/QuizAttemptModel.js";
 import Application from "../models/ApplicationModel.js";
-import Job from "../models/JobModel.js"; // Ensure Job model is registered
+import Job from "../models/JobModel.js";
 
 // Get User Profile with Aggregated Stats
 export const getUserProfile = async (req, res) => {
@@ -17,28 +16,11 @@ export const getUserProfile = async (req, res) => {
         }
         console.log("1. User fetched:", user.username);
 
-        // 2. Aggregate Quiz Stats
-        console.log("2. Starting Quiz Stats aggregation...");
-        const quizStats = await QuizAttempt.aggregate([
-            { $match: { userId: userId } },
-            {
-                $group: {
-                    _id: null,
-                    totalScore: { $sum: "$score" },
-                    quizzesTaken: { $sum: 1 },
-                    averagePercentage: { $avg: "$percentage" }
-                }
-            }
-        ]);
-        console.log("Quiz Stats result:", quizStats);
-
-        const stats = quizStats.length > 0 ? quizStats[0] : { totalScore: 0, quizzesTaken: 0, averagePercentage: 0 };
+        // 2. Quiz Stats (REMOVED)
+        const stats = { totalScore: 0, quizzesTaken: 0, averagePercentage: 0 };
 
         // 3. Fetch Job Applications
         console.log("3. Fetching Applications...");
-        // Debug: Check if Application model works without populate first
-        // const rawApps = await Application.find({ userId: userId });
-        // console.log("Raw Apps count:", rawApps.length);
 
         const applications = await Application.find({ userId: userId })
             .populate({
@@ -52,11 +34,7 @@ export const getUserProfile = async (req, res) => {
         // Combine everything
         res.status(200).json({
             user,
-            stats: {
-                totalScore: stats.totalScore,
-                quizzesTaken: stats.quizzesTaken,
-                averagePercentage: Math.round(stats.averagePercentage || 0)
-            },
+            stats,
             applications
         });
         console.log("-> Response sent successfully");

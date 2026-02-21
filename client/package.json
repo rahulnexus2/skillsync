@@ -21,6 +21,8 @@
     "react-icons": "^5.5.0",
     "react-router-dom": "^7.8.2",
     "react-select": "^5.10.2",
+    "socket.io-client": "^4.8.3",
+    "unpdf": "^1.4.0",
     "zod": "^4.1.5"
   },
   "devDependencies": {
