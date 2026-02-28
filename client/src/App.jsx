@@ -1,5 +1,5 @@
 
-import {RouteConfig} from "./routes/Routeconfig";
+import {RouteConfig} from "./routes/RouteConfig";
 
 import { BrowserRouter } from "react-router-dom";
 
