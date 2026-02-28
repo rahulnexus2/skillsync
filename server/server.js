@@ -110,10 +110,12 @@ io.on("connection", (socket) => {
 
 
 app.use(cors({
-  origin: ["http://localhost:5173", "https://skillsync-steel.vercel.app"],
+  origin: ["http://localhost:5173", 
+    "https://skillsync-steel.vercel.app"],
   credentials: true
 }));
 
+app.options("*", cors());
 
 app.use((req, res, next) => {
   console.log(`[REQUEST] ${req.method} ${req.url}`);
