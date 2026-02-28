@@ -28,7 +28,7 @@ import JobViewAll from "../JobCrud/JobViewAll";
 import JobCreation from "../JobCrud/JobCreation";
 import JobDetails from "../JobCrud/JobDetails";
 
-export const Routeconfig = () => {
+export const RouteConfig = () => {
   return (
     <Routes>
       {/* Root redirect */}
