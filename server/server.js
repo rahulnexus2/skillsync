@@ -1,57 +1,91 @@
 import express from "express";
 import { createServer } from "http";
 import { Server } from "socket.io";
-import connectDB from "./config/db.js";
 import cors from "cors";
-
 import session from "express-session";
 import passport from "passport";
 
-import resumeRoute from "./routes/resumeRoute.js";
-
-
+import connectDB from "./config/db.js";
 import config from "./config/config.js";
+
+import resumeRoute from "./routes/resumeRoute.js";
 import userRoute from "./routes/userRoute.js";
-import adminRoute from "./routes/adminRoute.js"
+import adminRoute from "./routes/adminRoute.js";
 import authRoute from "./routes/authRoute.js";
 
+import { Message } from "./models/MessageModel.js";
 
 const app = express();
 const httpServer = createServer(app);
 const port = config.port;
 
+/* ============================= */
+/* ✅ ALLOWED ORIGINS */
+/* ============================= */
+const allowedOrigins = [
+  "http://localhost:5173",
+  "https://skillsync-steel.vercel.app"
+];
+
+/* ============================= */
+/* ✅ EXPRESS CORS */
+/* ============================= */
+app.use(cors({
+  origin: allowedOrigins,
+  credentials: true,
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization"]
+}));
+
+app.options("*", cors());
+
+/* ============================= */
+/* ✅ BODY PARSER */
+/* ============================= */
+app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+
+/* ============================= */
+/* ✅ SESSION (CROSS ORIGIN SAFE) */
+/* ============================= */
+app.use(session({
+  secret: "mysecret",
+  resave: false,
+  saveUninitialized: false,
+  cookie: {
+    secure: true,        // required for cross-site cookies (HTTPS)
+    sameSite: "none"     // required for Vercel <-> Render
+  }
+}));
+
+app.use(passport.initialize());
+app.use(passport.session());
+
+/* ============================= */
+/* ✅ SOCKET.IO CORS */
+/* ============================= */
 const io = new Server(httpServer, {
   cors: {
-    origin: ["http://localhost:5173", "http://127.0.0.1:5173"],
+    origin: allowedOrigins,
     methods: ["GET", "POST"],
-    credentials: true,
-  },
+    credentials: true
+  }
 });
 
-import { Message } from "./models/MessageModel.js";
-
+/* ============================= */
+/* ✅ SOCKET EVENTS */
+/* ============================= */
 io.on("connection", (socket) => {
   console.log("New client connected:", socket.id);
 
-  // ===============================
-  // USER JOINS THEIR ROOM
-  // ===============================
   socket.on("join_user", (userId) => {
     socket.join(userId.toString());
-    console.log(`User ${userId} joined room ${userId}`);
   });
 
-  // ===============================
-  // ADMIN JOINS THEIR OWN PRIVATE ROOM
-  // ===============================
   socket.on("join_admin", (adminId) => {
     socket.join(adminId.toString());
-    console.log(`Admin ${adminId} joined their private room`);
   });
 
-  // ===============================
-  // USER → ADMIN (Private)
-  // ===============================
   socket.on("send_message_to_admin", async (data) => {
     const { senderId, receiverId, message } = data;
 
@@ -64,10 +98,7 @@ io.on("connection", (socket) => {
         message,
       });
 
-      // Send only to assigned admin
       io.to(receiverId.toString()).emit("receive_message", newMessage);
-
-      // Send back to user
       io.to(senderId.toString()).emit("receive_message", newMessage);
 
     } catch (error) {
@@ -75,9 +106,6 @@ io.on("connection", (socket) => {
     }
   });
 
-  // ===============================
-  // ADMIN → USER (Private)
-  // ===============================
   socket.on("send_message_to_user", async (data) => {
     const { senderId, receiverId, message } = data;
 
@@ -90,10 +118,7 @@ io.on("connection", (socket) => {
         message,
       });
 
-      // Send only to that user
       io.to(receiverId.toString()).emit("receive_message", newMessage);
-
-      // Send back to admin
       io.to(senderId.toString()).emit("receive_message", newMessage);
 
     } catch (error) {
@@ -106,57 +131,25 @@ io.on("connection", (socket) => {
   });
 });
 
-
-
-
-app.use(cors({
-  origin: ["http://localhost:5173", 
-    "https://skillsync-steel.vercel.app"],
-  credentials: true
-}));
-
-app.options("*", cors());
-
-app.use((req, res, next) => {
-  console.log(`[REQUEST] ${req.method} ${req.url}`);
-  next();
-});
-
-app.use(session({ secret: "mysecret", resave: false, saveUninitialized: true }));
-app.use(passport.initialize());
-app.use(passport.session())
-
-app.use(express.json());
-app.use("/api/v1/auth", authRoute);
-
-
-
-
-
-
-
+/* ============================= */
+/* ✅ ROUTES */
+/* ============================= */
 app.get("/", (req, res) => {
   res.send("Welcome to home page 🚀");
 });
 
-app.get("/api/v1/resume/test", (req, res) => {
-  res.send("Resume route working");
-});
-
+app.use("/api/v1/auth", authRoute);
 app.use("/api/v1/users", userRoute);
 app.use("/api/v1/admin", adminRoute);
-
-
 app.use("/api/v1/resume", resumeRoute);
 
-
-
+/* ============================= */
+/* ✅ START SERVER */
+/* ============================= */
 const startServer = async () => {
-  console.log("Starting server with updated CORS config...");
   try {
     await connectDB();
     console.log("✅ Connected to MongoDB");
-
 
     httpServer.listen(port, () => {
       console.log(`🚀 Server is running on port ${port}`);
