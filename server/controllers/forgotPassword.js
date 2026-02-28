@@ -2,7 +2,7 @@
 import crypto from "crypto";
 import User from "../models/UserModel.js";
 import Admin from "../models/AdminModel.js";
-import transporter from "../config/nodemailer.js";
+import transporter from "../config/Nodemailer.js";
 
 export const forgotPassword = async (req, res) => {
   try {
