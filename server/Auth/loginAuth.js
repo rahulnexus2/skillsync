@@ -1,45 +1,36 @@
-
-import User from "../models/UserModel.js"
 import bcrypt from "bcryptjs";
+import User from "../models/UserModel.js";
+import Admin from "../models/AdminModel.js";
 
+export const loginAuth = async (req, res, next) => {
+  try {
+    const { email, password } = req.body;
 
-export const loginAuth=async(req,res,next)=>{
-  try{
+    // First check User model
+    let account = await User.findOne({ email });
+    let role = "user";
 
-  const { email,password }=req.body;
-  const existingUser=await User.findOne({email})
+    // If not found in users, check Admin model
+    if (!account) {
+      account = await Admin.findOne({ email });
+      role = "admin";
+    }
 
+    if (!account) {
+      return res.status(400).json({ message: "No account found with this email" });
+    }
 
-  if(!existingUser){
+    const isMatch = await bcrypt.compare(password, account.password);
 
-    return res.status(500).json({
-      message:"Not a registered user"
-    })
+    if (!isMatch) {
+      return res.status(401).json({ message: "Invalid email or password" });
+    }
 
+    req.user = account;
+    req.role = role;
+
+    next();
+  } catch (error) {
+    res.status(500).json({ message: "Server error", error: error.message });
   }
-
-  const isMatch=await bcrypt.compare(
-    password,existingUser.password
-  );
-  
-  if(!isMatch){
-
-    return res.status(500).json({
-      message:"invalid email or password"
-    })
-
-  }
-
-  req.user=existingUser;
-
-  next();
-  
-}
-  catch(error)
-  {
-     res.status(500).json({
-      message:"server error",
-      error:error.message
-    });
-  }
-}
+};

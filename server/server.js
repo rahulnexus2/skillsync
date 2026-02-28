@@ -6,13 +6,15 @@ import cors from "cors";
 
 import session from "express-session";
 import passport from "passport";
-import { Oauth } from "./Oauth/Oauth.js"
+
 import resumeRoute from "./routes/resumeRoute.js";
 
 
 import config from "./config/config.js";
 import userRoute from "./routes/userRoute.js";
 import adminRoute from "./routes/adminRoute.js"
+import authRoute from "./routes/authRoute.js";
+
 
 const app = express();
 const httpServer = createServer(app);
@@ -112,6 +114,7 @@ app.use(cors({
   credentials: true
 }));
 
+
 app.use((req, res, next) => {
   console.log(`[REQUEST] ${req.method} ${req.url}`);
   next();
@@ -122,25 +125,13 @@ app.use(passport.initialize());
 app.use(passport.session())
 
 app.use(express.json());
+app.use("/api/v1/auth", authRoute);
 
 
-Oauth();
-
-app.get("/auth/google", passport.authenticate("google", { scope: ["profile", "email"] }));
-
-app.get("/auth/google/callback",
-  passport.authenticate("google", { failureRedirect: "/" }),
-  (req, res) => res.send("Login Successful! Welcome " + req.user.displayName)
-);
 
 
-app.get("/auth/failure", (req, res) => {
-  res.status(400).send(`
-    <h2>OAuth Login Failed</h2>
-    <p>There was a problem logging in with Google. Please check your credentials or try again.</p>
-    <a href="/auth/google">Try Again</a>
-  `);
-});
+
+
 
 app.get("/", (req, res) => {
   res.send("Welcome to home page 🚀");

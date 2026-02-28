@@ -1,5 +1,6 @@
 import Application from "../models/ApplicationModel.js";
 import Job from "../models/JobModel.js";
+import mongoose from "mongoose";
 
 // ===============================
 // USER: APPLY FOR JOB
@@ -19,10 +20,7 @@ export const applyForJob = async (req, res) => {
       return res.status(400).json({ message: "Already applied for this job" });
     }
 
-    const application = await Application.create({
-      jobId,
-      userId,
-    });
+    const application = await Application.create({ jobId, userId });
 
     res.status(201).json({
       message: "Application submitted successfully",
@@ -40,23 +38,35 @@ export const applyForJob = async (req, res) => {
 // ===============================
 export const getAdminApplications = async (req, res) => {
   try {
-    const adminId = req.admin._id;
+    const adminId = new mongoose.Types.ObjectId(req.admin._id);
+    const allJobs = await Job.find({});
+console.log("All jobs postedBy:", JSON.stringify(allJobs.map(j => j.postedBy)));
+console.log("Looking for adminId:", adminId);
 
+    // Find all jobs posted by this admin
     const jobs = await Job.find({ "postedBy.id": adminId });
-    const jobIds = jobs.map(job => job._id);
+    console.log("Jobs found for admin:", jobs.length);
+
+    const jobIds = jobs.map((job) => job._id);
+
+    if (jobIds.length === 0) {
+      return res.status(200).json([]);
+    }
 
     const applications = await Application.find({
-      jobId: { $in: jobIds }
+      jobId: { $in: jobIds },
     })
       .populate("jobId", "jobTitle company")
-      .populate("userId", "username email education skills projects")
+      .populate("userId", "username email phone education skills projects")
       .sort({ createdAt: -1 });
+
+    console.log("Applications found:", applications.length);
 
     res.status(200).json(applications);
 
   } catch (error) {
     console.error("Get admin applications error:", error);
-    res.status(500).json({ message: "Server error" });
+    res.status(500).json({ message: "Server error", error: error.message });
   }
 };
 
@@ -84,6 +94,10 @@ export const updateApplicationStatus = async (req, res) => {
       application.assignedAdminId = req.admin._id;
     }
 
+    if (status === "rejected") {
+      application.assignedAdminId = null;
+    }
+
     await application.save();
 
     res.status(200).json({
@@ -107,18 +121,16 @@ export const getChatStatus = async (req, res) => {
     const acceptedApplication = await Application.findOne({
       userId,
       status: "accepted",
-      assignedAdminId: { $ne: null }
+      assignedAdminId: { $ne: null },
     });
 
     if (!acceptedApplication) {
-      return res.status(200).json({
-        chatEnabled: false
-      });
+      return res.status(200).json({ chatEnabled: false });
     }
 
     return res.status(200).json({
       chatEnabled: true,
-      assignedAdminId: acceptedApplication.assignedAdminId
+      assignedAdminId: acceptedApplication.assignedAdminId,
     });
 
   } catch (error) {
@@ -126,4 +138,13 @@ export const getChatStatus = async (req, res) => {
     res.status(500).json({ message: "Server error" });
   }
 };
+
+
+
+
+
+
+
+
+
 

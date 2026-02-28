@@ -5,13 +5,12 @@ import * as z from 'zod';
 import { Link, useNavigate } from 'react-router-dom';
 import axiosInstance from '../utils/axiosInstance';
 import { Mail, Lock } from 'lucide-react';
-
 const schema = z.object({
     email: z.string().email("Invalid email address"),
     password: z.string().min(1, "Password is required"),
 });
 
-export const UserLogin = () => {
+export const Login = () => {
     const navigate = useNavigate();
     const { register, handleSubmit, formState: { errors } } = useForm({
         resolver: zodResolver(schema)
@@ -19,10 +18,16 @@ export const UserLogin = () => {
 
     const onSubmit = async (data) => {
         try {
-            const response = await axiosInstance.post('/users/login', data);
-            localStorage.setItem('token', response.data.token);
-            alert('Login Successful!');
-            navigate('/user/profile');
+            const response = await axiosInstance.post('/auth/login', data);
+            const { token, role } = response.data;
+
+            if (role === 'admin') {
+                localStorage.setItem('adminToken', token);
+                navigate('/admin/dashboard');
+            } else {
+                localStorage.setItem('token', token);
+                navigate('/user/profile');
+            }
         } catch (error) {
             console.error(error);
             alert(error.response?.data?.message || 'Login Failed');
@@ -69,10 +74,15 @@ export const UserLogin = () => {
                     </button>
                 </div>
             </form>
-            <div className="text-center mt-4">
+            <div className="text-center mt-4 space-y-2">
+                <div>
+                    <Link to="/forgot-password" className="text-sm font-medium text-indigo-600 hover:text-indigo-500">
+                        Forgot your password?
+                    </Link>
+                </div>
                 <p className="text-sm text-gray-600">
                     Don't have an account?{' '}
-                    <Link to="/user/signup" className="font-medium text-indigo-600 hover:text-indigo-500">
+                    <Link to="/signup" className="font-medium text-indigo-600 hover:text-indigo-500">
                         Sign up
                     </Link>
                 </p>

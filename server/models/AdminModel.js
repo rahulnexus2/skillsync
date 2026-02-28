@@ -20,7 +20,6 @@ const adminSchema = new Mongoose.Schema({
   password: {
     type: String,
     required: true,
-
     trim: true,
   },
 
@@ -28,18 +27,29 @@ const adminSchema = new Mongoose.Schema({
     type: String,
     enum: ["admin"],
     default: "admin"
-
   },
+
   phoneNumber: {
     type: String,
     default: ""
   },
+
   profilePicture: {
     type: String,
     default: ""
-  }
-}, { timestamps: true })
+  },
 
-const Admin = Mongoose.model("Admin", adminSchema) || Mongoose.models.Admin
+  // For forgot/reset password
+  otp: {
+    type: String,
+  },
 
-export default Admin
+  otpExpires: {
+    type: Date,
+  },
+
+}, { timestamps: true });
+
+const Admin = Mongoose.model("Admin", adminSchema) || Mongoose.models.Admin;
+
+export default Admin;

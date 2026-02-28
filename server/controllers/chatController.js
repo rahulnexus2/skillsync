@@ -13,7 +13,7 @@ export const getUsersForChat = async (req, res) => {
     const applications = await Application.find({
       assignedAdminId: adminId,
       status: "accepted",
-    }).populate("userId", "name email _id");
+    }).populate("userId", "username email _id");
 
     const users = applications.map(app => app.userId);
 
@@ -33,7 +33,7 @@ export const getAdminChatHistory = async (req, res) => {
     const { userId } = req.params;
     const adminId = req.admin._id;
 
-    // 🔥 Verify admin is assigned to this user
+    
     const application = await Application.findOne({
       userId,
       assignedAdminId: adminId,
@@ -69,14 +69,12 @@ export const getAdminChatHistory = async (req, res) => {
   }
 };
 
-// ===============================
-// User: Get chat history with assigned admin
-// ===============================
+
 export const getUserChatHistory = async (req, res) => {
   try {
     const userId = req.user._id;
 
-    // 🔥 Verify application accepted
+    
     const application = await Application.findOne({
       userId,
       status: "accepted",
