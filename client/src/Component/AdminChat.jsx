@@ -25,7 +25,9 @@ const AdminChat = () => {
     const token = localStorage.getItem("adminToken");
     if (!token) return;
 
-    const newSocket = io("http://localhost:8000");
+    const newSocket = io(import.meta.env.VITE_API_URL, {
+  transports: ["websocket"],
+});
     setSocket(newSocket);
 
     const decoded = jwtDecode(token);
