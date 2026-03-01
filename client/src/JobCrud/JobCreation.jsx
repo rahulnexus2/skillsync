@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { useForm } from "react-hook-form";
 import { useNavigate } from "react-router-dom";
-import axios from 'axios';
+
+import axiosInstance from '../utils/axiosInstance';
 import { Briefcase, MapPin, Calendar, FileText, DollarSign, Send } from 'lucide-react';
 
 const JobCreation = () => {
@@ -21,12 +22,11 @@ const JobCreation = () => {
 
             // Token is retrieved directly in axios call
 
-            await axios.post('http://localhost:8000/api/v1/admin/createjob', formattedData, {
-                headers: {
-                    Authorization: `Bearer ${localStorage.getItem('adminToken')}`
-                },
-                withCredentials: true
-            });
+            await axiosInstance.post('/admin/createjob', formattedData, {
+  headers: {
+    Authorization: `Bearer ${localStorage.getItem('adminToken')}`
+  }
+});
 
             alert('Job created successfully!');
             navigate('/admin/jobs');

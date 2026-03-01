@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import axios from 'axios';
+import axiosInstance from '../utils/axiosInstance';
 import { Briefcase, MapPin, Calendar, Trash2, Edit } from 'lucide-react';
 import { Link } from 'react-router-dom';
 
@@ -13,7 +13,11 @@ const JobViewAll = () => {
 
     const fetchJobs = async () => {
         try {
-            const res = await axios.get('http://localhost:8000/api/v1/admin/viewjob', { withCredentials: true });
+            const res = await axiosInstance.get('/admin/viewjob', {
+  headers: {
+    Authorization: `Bearer ${localStorage.getItem('adminToken')}`
+  }
+});
             setJobs(res.data);
             setLoading(false);
         } catch (err) {
@@ -27,12 +31,11 @@ const JobViewAll = () => {
 
         try {
             const token = localStorage.getItem('adminToken');
-            await axios.delete(`http://localhost:8000/api/v1/admin/deletejob/${jobId}`, {
-                headers: {
-                    Authorization: `Bearer ${token}`
-                },
-                withCredentials: true
-            });
+            await axiosInstance.delete(`/admin/deletejob/${jobId}`, {
+  headers: {
+    Authorization: `Bearer ${token}`
+  }
+}); 
             setJobs(prev => prev.filter(job => job._id !== jobId));
             alert("Job deleted successfully");
         } catch (err) {

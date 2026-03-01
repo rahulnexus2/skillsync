@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useForm } from "react-hook-form";
 import { useNavigate, useParams } from "react-router-dom";
-import axios from 'axios';
+import axiosInstance from '../utils/axiosInstance';
 import { Briefcase, MapPin, Calendar, FileText } from 'lucide-react';
 
 const JobUpdate = () => {
@@ -14,7 +14,11 @@ const JobUpdate = () => {
     useEffect(() => {
         const fetchJob = async () => {
             try {
-                const res = await axios.get(`http://localhost:8000/api/v1/admin/viewjob/${jobId}`);
+                const res = await axiosInstance.get(`/admin/viewjob/${jobId}`, {
+  headers: {
+    Authorization: `Bearer ${localStorage.getItem('adminToken')}`
+  }
+});
                 const job = res.data;
 
                 // Populate form
@@ -47,12 +51,11 @@ const JobUpdate = () => {
                 skills: data.skills.split(',').map(skill => skill.trim())
             };
 
-            await axios.put(`http://localhost:8000/api/v1/admin/updatejob/${jobId}`, formattedData, {
-                headers: {
-                    Authorization: `Bearer ${localStorage.getItem('adminToken')}`
-                },
-                withCredentials: true
-            });
+            await axiosInstance.put(`/admin/updatejob/${jobId}`, formattedData, {
+  headers: {
+    Authorization: `Bearer ${localStorage.getItem('adminToken')}`
+  }
+});
 
             alert('Job updated successfully!');
             navigate('/admin/jobs');
