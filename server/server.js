@@ -2,8 +2,6 @@ import express from "express";
 import { createServer } from "http";
 import { Server } from "socket.io";
 import cors from "cors";
-import session from "express-session";
-import passport from "passport";
 
 import connectDB from "./config/db.js";
 import config from "./config/config.js";
@@ -19,62 +17,32 @@ const app = express();
 const httpServer = createServer(app);
 const port = config.port;
 
-/* ============================= */
-/* ✅ ALLOWED ORIGINS */
-/* ============================= */
-const allowedOrigins = [
-  "http://localhost:5173",
-  "https://skillsync-steel.vercel.app"
-];
-
-/* ============================= */
-/* ✅ EXPRESS CORS */
-/* ============================= */
+/* ===================================== */
+/* ✅ SIMPLE PRODUCTION CORS (NO COOKIES) */
+/* ===================================== */
 app.use(cors({
-  origin: allowedOrigins,
-  credentials: true,
-  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-  allowedHeaders: ["Content-Type", "Authorization"]
+  origin: "https://skillsync-steel.vercel.app"
 }));
 
-app.options("*", cors());
-
-/* ============================= */
+/* ===================================== */
 /* ✅ BODY PARSER */
-/* ============================= */
+/* ===================================== */
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-/* ============================= */
-/* ✅ SESSION (CROSS ORIGIN SAFE) */
-/* ============================= */
-app.use(session({
-  secret: "mysecret",
-  resave: false,
-  saveUninitialized: false,
-  cookie: {
-    secure: true,        // required for cross-site cookies (HTTPS)
-    sameSite: "none"     // required for Vercel <-> Render
-  }
-}));
-
-app.use(passport.initialize());
-app.use(passport.session());
-
-/* ============================= */
-/* ✅ SOCKET.IO CORS */
-/* ============================= */
+/* ===================================== */
+/* ✅ SOCKET.IO WITH CORS */
+/* ===================================== */
 const io = new Server(httpServer, {
   cors: {
-    origin: allowedOrigins,
-    methods: ["GET", "POST"],
-    credentials: true
+    origin: "https://skillsync-steel.vercel.app",
+    methods: ["GET", "POST"]
   }
 });
 
-/* ============================= */
+/* ===================================== */
 /* ✅ SOCKET EVENTS */
-/* ============================= */
+/* ===================================== */
 io.on("connection", (socket) => {
   console.log("New client connected:", socket.id);
 
@@ -87,42 +55,38 @@ io.on("connection", (socket) => {
   });
 
   socket.on("send_message_to_admin", async (data) => {
-    const { senderId, receiverId, message } = data;
-
     try {
       const newMessage = await Message.create({
-        senderId,
-        receiverId,
+        senderId: data.senderId,
+        receiverId: data.receiverId,
         senderModel: "User",
         receiverModel: "Admin",
-        message,
+        message: data.message,
       });
 
-      io.to(receiverId.toString()).emit("receive_message", newMessage);
-      io.to(senderId.toString()).emit("receive_message", newMessage);
+      io.to(data.receiverId.toString()).emit("receive_message", newMessage);
+      io.to(data.senderId.toString()).emit("receive_message", newMessage);
 
     } catch (error) {
-      console.error("Error sending message to admin:", error);
+      console.error("Error sending message:", error);
     }
   });
 
   socket.on("send_message_to_user", async (data) => {
-    const { senderId, receiverId, message } = data;
-
     try {
       const newMessage = await Message.create({
-        senderId,
-        receiverId,
+        senderId: data.senderId,
+        receiverId: data.receiverId,
         senderModel: "Admin",
         receiverModel: "User",
-        message,
+        message: data.message,
       });
 
-      io.to(receiverId.toString()).emit("receive_message", newMessage);
-      io.to(senderId.toString()).emit("receive_message", newMessage);
+      io.to(data.receiverId.toString()).emit("receive_message", newMessage);
+      io.to(data.senderId.toString()).emit("receive_message", newMessage);
 
     } catch (error) {
-      console.error("Error sending message to user:", error);
+      console.error("Error sending message:", error);
     }
   });
 
@@ -131,11 +95,11 @@ io.on("connection", (socket) => {
   });
 });
 
-/* ============================= */
+/* ===================================== */
 /* ✅ ROUTES */
-/* ============================= */
+/* ===================================== */
 app.get("/", (req, res) => {
-  res.send("Welcome to home page 🚀");
+  res.send("Backend is running 🚀");
 });
 
 app.use("/api/v1/auth", authRoute);
@@ -143,9 +107,9 @@ app.use("/api/v1/users", userRoute);
 app.use("/api/v1/admin", adminRoute);
 app.use("/api/v1/resume", resumeRoute);
 
-/* ============================= */
+/* ===================================== */
 /* ✅ START SERVER */
-/* ============================= */
+/* ===================================== */
 const startServer = async () => {
   try {
     await connectDB();
