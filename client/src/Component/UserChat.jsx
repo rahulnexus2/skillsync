@@ -3,6 +3,7 @@ import { io } from "socket.io-client";
 import axiosInstance from "../utils/axiosInstance";
 import { jwtDecode } from "jwt-decode";
 import { Send, MessageCircle, Loader } from "lucide-react";
+import { PageHeader } from "../components/PageHeader";
 
 const UserChat = () => {
   const [messages, setMessages] = useState([]);
@@ -15,9 +16,6 @@ const UserChat = () => {
 
   const messagesEndRef = useRef(null);
 
-  /* ============================= */
-  /* ✅ Decode Token + Check Status */
-  /* ============================= */
   useEffect(() => {
     const token = localStorage.getItem("token");
     if (!token) {
@@ -28,21 +26,16 @@ const UserChat = () => {
     try {
       const decoded = jwtDecode(token);
       setUserId(decoded.id);
-      checkChatStatus(token);
+      checkChatStatus();
     } catch (error) {
       console.error("Invalid token", error);
       setLoading(false);
     }
   }, []);
 
-  /* ============================= */
-  /* ✅ Check Chat Enabled          */
-  /* ============================= */
-  const checkChatStatus = async (token) => {
+  const checkChatStatus = async () => {
     try {
-      const res = await axiosInstance.get("/users/application/chat-status", {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const res = await axiosInstance.get("/users/application/chat-status");
 
       if (res.data.chatEnabled) {
         setChatEnabled(true);
@@ -55,18 +48,12 @@ const UserChat = () => {
     }
   };
 
-  /* ============================= */
-  /* ✅ Fetch Chat History          */
-  /* ============================= */
   useEffect(() => {
     if (!chatEnabled) return;
 
     const fetchHistory = async () => {
       try {
-        const token = localStorage.getItem("token");
-        const res = await axiosInstance.get("/users/chat", {
-          headers: { Authorization: `Bearer ${token}` },
-        });
+        const res = await axiosInstance.get("/users/chat");
         setMessages(res.data);
       } catch (error) {
         console.error("History fetch error:", error);
@@ -76,14 +63,17 @@ const UserChat = () => {
     fetchHistory();
   }, [chatEnabled]);
 
-  /* ============================= */
-  /* ✅ Connect Socket After History */
-  /* ============================= */
   useEffect(() => {
     if (!chatEnabled || !userId) return;
 
+    const token = localStorage.getItem("token");
     const newSocket = io(import.meta.env.VITE_API_URL, {
       transports: ["websocket"],
+      auth: { token },
+    });
+
+    newSocket.on("connect_error", (err) => {
+      console.error("Socket connection failed:", err.message);
     });
 
     setSocket(newSocket);
@@ -91,16 +81,14 @@ const UserChat = () => {
     newSocket.emit("join_user", userId);
 
     newSocket.on("receive_message", (message) => {
-      // Avoid duplicates: skip if this message was already added optimistically
       setMessages((prev) => {
         const isDuplicate = prev.some(
           (m) =>
             m.message === message.message &&
             m.senderModel === message.senderModel &&
-            m._id === undefined // optimistic messages won't have _id
+            m._id === undefined
         );
         if (isDuplicate) {
-          // Replace the optimistic message with the real one from server
           return prev.map((m) =>
             m.message === message.message &&
             m.senderModel === message.senderModel &&
@@ -116,9 +104,6 @@ const UserChat = () => {
     return () => newSocket.disconnect();
   }, [chatEnabled, userId]);
 
-  /* ============================= */
-  /* ✅ Send Message                */
-  /* ============================= */
   const handleSend = (e) => {
     e.preventDefault();
 
@@ -128,93 +113,58 @@ const UserChat = () => {
       senderId: userId,
       receiverId: assignedAdminId,
       message: newMessage,
-      senderModel: "User", // used for alignment in UI
+      senderModel: "User",
     };
 
     socket.emit("send_message_to_admin", msgObj);
 
-    // Optimistically add message so sender sees it immediately
     setMessages((prev) => [...prev, msgObj]);
     setNewMessage("");
   };
 
-  /* ============================= */
-  /* ✅ Auto Scroll                 */
-  /* ============================= */
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   }, [messages]);
 
-  /* ============================= */
-  /* 🔄 Loading State              */
-  /* ============================= */
-  if (loading)
+  if (loading) {
     return (
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          height: "60vh",
-          gap: 12,
-          color: "#6366f1",
-        }}
-      >
-        <Loader size={20} />
-        <span>Checking chat status...</span>
+      <div className="flex h-[40vh] flex-col items-center justify-center gap-3 text-muted-foreground">
+        <Loader className="h-8 w-8 animate-spin text-primary" />
+        <p className="text-sm">Checking chat access…</p>
       </div>
     );
+  }
 
-  /* ============================= */
-  /* 🚫 Chat Disabled              */
-  /* ============================= */
-  if (!chatEnabled)
+  if (!chatEnabled) {
     return (
-      <div
-        style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          height: "60vh",
-        }}
-      >
-        <div style={{ textAlign: "center", maxWidth: 360 }}>
-          <MessageCircle size={36} style={{ marginBottom: 12, opacity: 0.4 }} />
-          <h3>Chat Not Available Yet</h3>
-          <p>Chat will unlock once an admin accepts your job application.</p>
+      <div className="mx-auto max-w-md">
+        <PageHeader
+          title="Messages"
+          description="Chat unlocks when a recruiter accepts your application."
+        />
+        <div className="card-panel flex flex-col items-center px-6 py-16 text-center">
+          <MessageCircle className="mb-4 h-12 w-12 text-muted-foreground/40" />
+          <p className="font-medium text-foreground">Chat not available yet</p>
+          <p className="mt-2 text-sm text-muted-foreground">
+            Apply to roles and wait for an acceptance to message the team.
+          </p>
         </div>
       </div>
     );
+  }
 
-  /* ============================= */
-  /* 💬 Chat UI                    */
-  /* ============================= */
   return (
-    <div style={{ maxWidth: 800, margin: "0 auto", padding: 24 }}>
-      <h2 style={{ marginBottom: 16 }}>Chat with Admin</h2>
+    <div className="mx-auto flex max-w-3xl flex-col">
+      <PageHeader
+        title="Messages"
+        description="Conversation with your assigned recruiter."
+      />
 
-      <div
-        style={{
-          border: "1px solid #eee",
-          borderRadius: 12,
-          overflow: "hidden",
-        }}
-      >
-        {/* Messages */}
-        <div
-          style={{
-            height: 450,
-            overflowY: "auto",
-            padding: 20,
-            display: "flex",
-            flexDirection: "column",
-            gap: 12,
-            background: "#fafafa",
-          }}
-        >
+      <div className="card-panel flex flex-col overflow-hidden" style={{ minHeight: "420px" }}>
+        <div className="flex-1 space-y-3 overflow-y-auto bg-muted/20 p-4 sm:p-5">
           {messages.length === 0 ? (
-            <p style={{ textAlign: "center", opacity: 0.6 }}>
-              No messages yet.
+            <p className="py-8 text-center text-sm text-muted-foreground">
+              No messages yet. Say hello below.
             </p>
           ) : (
             messages.map((msg, index) => {
@@ -222,21 +172,14 @@ const UserChat = () => {
               return (
                 <div
                   key={msg._id || index}
-                  style={{
-                    display: "flex",
-                    justifyContent: isUser ? "flex-end" : "flex-start",
-                  }}
+                  className={`flex ${isUser ? "justify-end" : "justify-start"}`}
                 >
                   <div
-                    style={{
-                      background: isUser ? "#6366f1" : "white",
-                      color: isUser ? "white" : "#111",
-                      padding: "10px 14px",
-                      borderRadius: 12,
-                      maxWidth: "70%",
-                      boxShadow: "0 1px 3px rgba(0,0,0,0.08)",
-                      wordBreak: "break-word",
-                    }}
+                    className={`max-w-[85%] rounded-2xl px-4 py-2.5 text-sm leading-relaxed shadow-sm ${
+                      isUser
+                        ? "rounded-br-md bg-primary text-primary-foreground"
+                        : "rounded-bl-md border border-border bg-card text-foreground"
+                    }`}
                   >
                     {msg.message}
                   </div>
@@ -247,45 +190,24 @@ const UserChat = () => {
           <div ref={messagesEndRef} />
         </div>
 
-        {/* Input */}
         <form
           onSubmit={handleSend}
-          style={{
-            display: "flex",
-            gap: 10,
-            padding: 16,
-            borderTop: "1px solid #eee",
-            background: "white",
-          }}
+          className="flex gap-2 border-t border-border bg-card p-3 sm:p-4"
         >
           <input
             type="text"
             value={newMessage}
             onChange={(e) => setNewMessage(e.target.value)}
-            placeholder="Type your message..."
-            style={{
-              flex: 1,
-              padding: 10,
-              borderRadius: 8,
-              border: "1px solid #ddd",
-              outline: "none",
-              fontSize: 14,
-            }}
+            placeholder="Type a message…"
+            className="input-ctrl flex-1"
           />
           <button
             type="submit"
             disabled={!newMessage.trim()}
-            style={{
-              padding: "0 16px",
-              background: newMessage.trim() ? "#6366f1" : "#c7d2fe",
-              color: "white",
-              border: "none",
-              borderRadius: 8,
-              cursor: newMessage.trim() ? "pointer" : "not-allowed",
-              transition: "background 0.2s",
-            }}
+            className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-primary text-primary-foreground transition-opacity hover:opacity-90 disabled:opacity-40"
+            aria-label="Send"
           >
-            <Send size={16} />
+            <Send className="h-4 w-4" />
           </button>
         </form>
       </div>

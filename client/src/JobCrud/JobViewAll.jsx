@@ -1,101 +1,123 @@
-import React, { useEffect, useState } from 'react';
-import axiosInstance from '../utils/axiosInstance';
-import { Briefcase, MapPin, Calendar, Trash2, Edit } from 'lucide-react';
-import { Link } from 'react-router-dom';
+import React, { useEffect, useState } from "react";
+import axiosInstance from "../utils/axiosInstance";
+import { toast } from "sonner";
+import { Briefcase, MapPin, Calendar, Trash2, Edit, Loader } from "lucide-react";
+import { Link } from "react-router-dom";
 
 const JobViewAll = () => {
-    const [jobs, setJobs] = useState([]);
-    const [loading, setLoading] = useState(true);
+  const [jobs, setJobs] = useState([]);
+  const [loading, setLoading] = useState(true);
 
-    useEffect(() => {
-        fetchJobs();
-    }, []);
+  useEffect(() => {
+    fetchJobs();
+  }, []);
 
-    const fetchJobs = async () => {
-        try {
-            const res = await axiosInstance.get('/admin/viewjob', {
-  headers: {
-    Authorization: `Bearer ${localStorage.getItem('adminToken')}`
-  }
-});
-            setJobs(res.data);
-            setLoading(false);
-        } catch (err) {
-            console.error(err);
-            setLoading(false);
-        }
-    };
+  const fetchJobs = async () => {
+    try {
+      const res = await axiosInstance.get("/admin/viewjob");
+      setJobs(res.data);
+    } catch (err) {
+      console.error(err);
+      toast.error("Could not load jobs.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    const handleDelete = async (jobId) => {
-        if (!window.confirm("Are you sure you want to delete this job?")) return;
+  const handleDelete = async (jobId) => {
+    if (!window.confirm("Delete this job listing?")) return;
+    try {
+      await axiosInstance.delete(`/admin/deletejob/${jobId}`);
+      setJobs((prev) => prev.filter((job) => job._id !== jobId));
+      toast.success("Job removed.");
+    } catch (err) {
+      console.error(err);
+      toast.error("Could not delete job.");
+    }
+  };
 
-        try {
-            const token = localStorage.getItem('adminToken');
-            await axiosInstance.delete(`/admin/deletejob/${jobId}`, {
-  headers: {
-    Authorization: `Bearer ${token}`
-  }
-}); 
-            setJobs(prev => prev.filter(job => job._id !== jobId));
-            alert("Job deleted successfully");
-        } catch (err) {
-            console.error(err);
-            alert("Failed to delete job");
-        }
-    };
-
-    if (loading) return <div className="p-8 text-center text-gray-500">Loading jobs...</div>;
-
+  if (loading) {
     return (
-        <div className="space-y-6">
-            <h2 className="text-2xl font-bold text-gray-800">Manage Jobs</h2>
-            <div className="grid grid-cols-1 gap-4">
-                {jobs.map((job) => (
-                    <div key={job._id} className="bg-white rounded-xl shadow-sm border border-gray-100 p-6 flex flex-col md:flex-row justify-between items-center transition-hover hover:bg-gray-50">
-                        <div className="flex-1">
-                            <div className="flex items-center space-x-3 mb-2">
-                                <h3 className="text-xl font-bold text-gray-800">{job.jobTitle}</h3>
-                                <span className="px-3 py-1 bg-green-100 text-green-700 text-xs font-semibold rounded-full uppercase">
-                                    {job.jobType}
-                                </span>
-                            </div>
-                            <p className="text-gray-500 font-medium">{job.company}</p>
-                            <div className="flex items-center text-gray-500 text-sm mt-2 space-x-4">
-                                <div className="flex items-center space-x-1">
-                                    <MapPin className="w-4 h-4" />
-                                    <span>{job.location}</span>
-                                </div>
-                                {job.deadline && (
-                                    <div className="flex items-center space-x-1">
-                                        <Calendar className="w-4 h-4" />
-                                        <span>{new Date(job.deadline).toLocaleDateString()}</span>
-                                    </div>
-                                )}
-                            </div>
-                        </div>
-
-                        <div className="flex space-x-3 mt-4 md:mt-0">
-
-                            <Link
-                                to={`update/${job._id}`}
-                                className="flex items-center space-x-2 px-4 py-2 bg-blue-100 text-blue-600 rounded-lg hover:bg-blue-200 transition-colors"
-                            >
-                                <Edit className="w-4 h-4" />
-                                <span>Edit</span>
-                            </Link>
-                            <button
-                                onClick={() => handleDelete(job._id)}
-                                className="flex items-center space-x-2 px-4 py-2 bg-red-100 text-red-600 rounded-lg hover:bg-red-200 transition-colors"
-                            >
-                                <Trash2 className="w-4 h-4" />
-                                <span>Delete</span>
-                            </button>
-                        </div>
-                    </div>
-                ))}
-            </div>
-        </div>
+      <div className="flex flex-col items-center justify-center gap-3 py-20 text-muted-foreground">
+        <Loader className="h-8 w-8 animate-spin text-primary" />
+        <p className="text-sm">Loading listings…</p>
+      </div>
     );
+  }
+
+  if (jobs.length === 0) {
+    return (
+      <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-border py-20 text-center">
+        <Briefcase className="mb-3 h-12 w-12 text-muted-foreground/40" />
+        <p className="font-medium text-foreground">No jobs yet</p>
+        <p className="mt-1 max-w-sm text-sm text-muted-foreground">
+          Create your first listing to attract candidates.
+        </p>
+        <Link
+          to="/admin/jobs/create"
+          className="mt-6 rounded-lg bg-primary px-4 py-2 text-sm font-semibold text-primary-foreground hover:bg-primary/90"
+        >
+          Create job
+        </Link>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-4">
+      {jobs.map((job) => (
+        <div
+          key={job._id}
+          className="flex flex-col gap-4 rounded-xl border border-border bg-card p-5 transition-shadow hover:shadow-md sm:flex-row sm:items-center sm:justify-between"
+        >
+          <div className="min-w-0 flex-1">
+            <div className="flex flex-wrap items-center gap-2">
+              <h3 className="text-lg font-semibold text-foreground">{job.jobTitle}</h3>
+              <span className="rounded-full bg-emerald-500/10 px-2.5 py-0.5 text-xs font-semibold uppercase text-emerald-700 dark:text-emerald-400">
+                {job.jobType}
+              </span>
+            </div>
+            <p className="mt-1 font-medium text-primary">{job.company}</p>
+            <div className="mt-2 flex flex-wrap gap-4 text-sm text-muted-foreground">
+              <span className="inline-flex items-center gap-1">
+                <MapPin className="h-4 w-4 shrink-0" />
+                {job.location}
+              </span>
+              {job.deadline && (
+                <span className="inline-flex items-center gap-1">
+                  <Calendar className="h-4 w-4 shrink-0" />
+                  {new Date(job.deadline).toLocaleDateString()}
+                </span>
+              )}
+            </div>
+          </div>
+          <div className="flex shrink-0 gap-2">
+            <Link
+              to={`/admin/jobs/view/${job._id}`}
+              className="btn-secondary text-sm"
+            >
+              View
+            </Link>
+            <Link
+              to={`/admin/jobs/update/${job._id}`}
+              className="inline-flex items-center gap-2 rounded-lg border border-border bg-card px-4 py-2 text-sm font-medium text-foreground hover:bg-muted"
+            >
+              <Edit className="h-4 w-4" />
+              Edit
+            </Link>
+            <button
+              type="button"
+              onClick={() => handleDelete(job._id)}
+              className="inline-flex items-center gap-2 rounded-lg border border-destructive/30 bg-card px-4 py-2 text-sm font-medium text-destructive hover:bg-destructive/10"
+            >
+              <Trash2 className="h-4 w-4" />
+              Delete
+            </button>
+          </div>
+        </div>
+      ))}
+    </div>
+  );
 };
 
 export default JobViewAll;

@@ -1,19 +1,38 @@
 import React, { useEffect, useState } from "react";
 import axiosInstance from "../utils/axiosInstance";
 import {
-  Briefcase, MapPin, Calendar, Send, Search,
-  Filter, Clock, CheckCircle, XCircle, Loader
+  Briefcase,
+  MapPin,
+  Calendar,
+  Send,
+  Search,
+  Filter,
+  Clock,
+  CheckCircle,
+  XCircle,
+  Loader,
 } from "lucide-react";
+import { toast } from "sonner";
+import { PageHeader } from "../components/PageHeader";
+
+const typeBadgeClass = {
+  fulltime: "bg-emerald-500/10 text-emerald-700 dark:text-emerald-400",
+  parttime: "bg-amber-500/10 text-amber-700 dark:text-amber-400",
+  internship: "bg-blue-500/10 text-blue-700 dark:text-blue-400",
+  remote: "bg-violet-500/10 text-violet-700 dark:text-violet-400",
+};
 
 const UserJobs = () => {
   const [jobs, setJobs] = useState([]);
   const [loading, setLoading] = useState(true);
   const [applying, setApplying] = useState(null);
-  const [applied, setApplied] = useState({}); // jobId -> "success" | "already" | "error"
+  const [applied, setApplied] = useState({});
   const [search, setSearch] = useState("");
   const [typeFilter, setTypeFilter] = useState("all");
 
-  useEffect(() => { fetchJobs(); }, []);
+  useEffect(() => {
+    fetchJobs();
+  }, []);
 
   const fetchJobs = async () => {
     try {
@@ -21,6 +40,7 @@ const UserJobs = () => {
       setJobs(res.data);
     } catch (err) {
       console.error(err);
+      toast.error("Could not load jobs.");
     } finally {
       setLoading(false);
     }
@@ -29,203 +49,216 @@ const UserJobs = () => {
   const handleApply = async (jobId) => {
     setApplying(jobId);
     try {
-      await axiosInstance.post(`/users/apply/${jobId}`, {}, {
-        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }
-      });
-      setApplied(prev => ({ ...prev, [jobId]: "success" }));
+      await axiosInstance.post(`/users/apply/${jobId}`, {});
+      setApplied((prev) => ({ ...prev, [jobId]: "success" }));
+      toast.success("Application sent.");
     } catch (err) {
       const msg = err.response?.data?.message || "";
       if (msg.toLowerCase().includes("already")) {
-        setApplied(prev => ({ ...prev, [jobId]: "already" }));
+        setApplied((prev) => ({ ...prev, [jobId]: "already" }));
+        toast.info("You already applied to this role.");
       } else {
-        setApplied(prev => ({ ...prev, [jobId]: "error" }));
+        setApplied((prev) => ({ ...prev, [jobId]: "error" }));
+        toast.error(msg || "Could not apply.");
       }
     } finally {
       setApplying(null);
     }
   };
 
-  const jobTypes = ["all", ...new Set(jobs.map(j => j.jobType).filter(Boolean))];
+  const jobTypes = ["all", ...new Set(jobs.map((j) => j.jobType).filter(Boolean))];
 
-  const filtered = jobs.filter(job => {
+  const filtered = jobs.filter((job) => {
+    const q = search.toLowerCase();
     const matchSearch =
-      job.jobTitle?.toLowerCase().includes(search.toLowerCase()) ||
-      job.company?.toLowerCase().includes(search.toLowerCase()) ||
-      job.location?.toLowerCase().includes(search.toLowerCase());
+      job.jobTitle?.toLowerCase().includes(q) ||
+      job.company?.toLowerCase().includes(q) ||
+      job.location?.toLowerCase().includes(q);
     const matchType = typeFilter === "all" || job.jobType === typeFilter;
     return matchSearch && matchType;
   });
 
-  const typeColors = {
-    fulltime: { bg: "#dcfce7", color: "#16a34a" },
-    parttime: { bg: "#fef9c3", color: "#ca8a04" },
-    internship: { bg: "#dbeafe", color: "#2563eb" },
-    remote: { bg: "#f5f3ff", color: "#7c3aed" },
-  };
-
-  if (loading) return (
-    <div style={{ display: "flex", alignItems: "center", justifyContent: "center", height: "60vh", gap: 12, color: "#6366f1", fontFamily: "'DM Sans', sans-serif" }}>
-      <Loader size={20} style={{ animation: "spin 1s linear infinite" }} />
-      <span>Loading opportunities...</span>
-      <style>{`@keyframes spin { to { transform: rotate(360deg); } }`}</style>
-    </div>
-  );
+  if (loading) {
+    return (
+      <div className="flex h-[50vh] flex-col items-center justify-center gap-3 text-muted-foreground">
+        <Loader className="h-6 w-6 animate-spin text-primary" />
+        <p className="text-sm">Loading opportunities…</p>
+      </div>
+    );
+  }
 
   return (
-    <div style={{ fontFamily: "'DM Sans', sans-serif", maxWidth: 1100, margin: "0 auto", padding: "24px 16px" }}>
-      <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&display=swap');
-        .job-card { background: white; border: 1px solid #ede9fe; border-radius: 16px; padding: 24px; display: flex; flex-direction: column; justify-content: space-between; transition: transform 0.2s, box-shadow 0.2s; }
-        .job-card:hover { transform: translateY(-3px); box-shadow: 0 12px 40px rgba(99,102,241,0.1); border-color: #c4b5fd; }
-        .apply-btn { width: 100%; padding: 11px; background: linear-gradient(135deg, #6366f1, #7c3aed); color: white; border: none; border-radius: 10px; font-size: 14px; font-weight: 600; cursor: pointer; font-family: 'DM Sans', sans-serif; display: flex; align-items: center; justify-content: center; gap: 6px; transition: opacity 0.2s; }
-        .apply-btn:hover { opacity: 0.9; }
-        .apply-btn:disabled { opacity: 0.6; cursor: not-allowed; }
-        .search-input { width: 100%; padding: 10px 14px 10px 40px; border: 1.5px solid #e2e8f0; border-radius: 10px; font-size: 14px; font-family: 'DM Sans', sans-serif; outline: none; transition: border-color 0.2s; box-sizing: border-box; }
-        .search-input:focus { border-color: #6366f1; box-shadow: 0 0 0 3px rgba(99,102,241,0.08); }
-        .filter-btn { padding: 8px 16px; border-radius: 100px; font-size: 13px; font-weight: 500; cursor: pointer; font-family: 'DM Sans', sans-serif; border: 1.5px solid #e2e8f0; background: white; color: #64748b; transition: all 0.2s; }
-        .filter-btn.active { background: #6366f1; color: white; border-color: #6366f1; }
-        .filter-btn:hover:not(.active) { border-color: #c4b5fd; color: #6366f1; }
-      `}</style>
+    <div className="mx-auto max-w-6xl">
+      <PageHeader
+        title="Job opportunities"
+        description={`${jobs.length} active listing${jobs.length !== 1 ? "s" : ""}. Search and filter to find a fit.`}
+      />
 
-      {/* Header */}
-      <div style={{ marginBottom: 24 }}>
-        <h1 style={{ fontSize: 26, fontWeight: 600, color: "#1e1b4b", marginBottom: 4 }}>
-          Job Opportunities
-        </h1>
-        <p style={{ fontSize: 14, color: "#94a3b8" }}>
-          {jobs.length} active listing{jobs.length !== 1 ? "s" : ""} available
-        </p>
-      </div>
-
-      {/* Search + Filter */}
-      <div style={{ background: "white", border: "1px solid #ede9fe", borderRadius: 14, padding: "16px 20px", marginBottom: 24, display: "flex", gap: 16, alignItems: "center", flexWrap: "wrap" }}>
-        {/* Search */}
-        <div style={{ position: "relative", flex: 1, minWidth: 200 }}>
-          <Search size={16} style={{ position: "absolute", left: 12, top: "50%", transform: "translateY(-50%)", color: "#94a3b8" }} />
+      <div className="mb-6 flex flex-col gap-4 rounded-xl border border-border bg-muted/30 p-4 sm:flex-row sm:items-center">
+        <div className="relative min-w-0 flex-1">
+          <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <input
-            className="search-input"
-            type="text"
-            placeholder="Search by title, company or location..."
+            type="search"
+            placeholder="Search title, company, location…"
             value={search}
-            onChange={e => setSearch(e.target.value)}
+            onChange={(e) => setSearch(e.target.value)}
+            className="w-full rounded-lg border border-border bg-card py-2.5 pl-10 pr-3 text-sm text-foreground shadow-sm placeholder:text-muted-foreground focus:border-primary focus:outline-none focus:ring-2 focus:ring-primary/20"
           />
         </div>
-
-        {/* Type Filters */}
-        <div style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center" }}>
-          <Filter size={15} color="#94a3b8" />
-          {jobTypes.map(type => (
+        <div className="flex flex-wrap items-center gap-2">
+          <Filter className="h-4 w-4 shrink-0 text-muted-foreground" />
+          {jobTypes.map((type) => (
             <button
               key={type}
-              className={`filter-btn ${typeFilter === type ? "active" : ""}`}
+              type="button"
               onClick={() => setTypeFilter(type)}
+              className={`rounded-full border px-3 py-1 text-xs font-medium transition-colors ${
+                typeFilter === type
+                  ? "border-primary bg-primary/10 text-primary"
+                  : "border-border bg-card text-muted-foreground hover:border-primary/40 hover:text-foreground"
+              }`}
             >
-              {type === "all" ? "All" : type.charAt(0).toUpperCase() + type.slice(1)}
+              {type === "all"
+                ? "All"
+                : type.charAt(0).toUpperCase() + type.slice(1)}
             </button>
           ))}
         </div>
       </div>
 
-      {/* Jobs Grid */}
       {filtered.length === 0 ? (
-        <div style={{ textAlign: "center", padding: "60px 20px", color: "#94a3b8" }}>
-          <Briefcase size={40} style={{ margin: "0 auto 12px", opacity: 0.3, display: "block" }} />
-          <p style={{ fontSize: 15 }}>No jobs found matching your search.</p>
+        <div className="flex flex-col items-center justify-center rounded-xl border border-dashed border-border py-16 text-center">
+          <Briefcase className="mb-3 h-10 w-10 text-muted-foreground/40" />
+          <p className="text-sm font-medium text-foreground">No roles match</p>
+          <p className="mt-1 max-w-sm text-sm text-muted-foreground">
+            Try another search or filter.
+          </p>
         </div>
       ) : (
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))", gap: 20 }}>
-          {filtered.map(job => {
+        <div className="grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
+          {filtered.map((job) => {
             const appStatus = applied[job._id];
-            const typeColor = typeColors[job.jobType] || { bg: "#f1f5f9", color: "#64748b" };
-            const isDeadlinePassed = job.deadline && new Date(job.deadline) < new Date();
+            const badgeClass =
+              typeBadgeClass[job.jobType] ||
+              "bg-muted text-muted-foreground";
+            const isDeadlinePassed =
+              job.deadline && new Date(job.deadline) < new Date();
 
             return (
-              <div key={job._id} className="job-card">
-                <div>
-                  {/* Top Row */}
-                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 16 }}>
-                    <div style={{ width: 42, height: 42, background: "#f5f3ff", borderRadius: 10, display: "flex", alignItems: "center", justifyContent: "center" }}>
-                      <Briefcase size={20} color="#6366f1" />
-                    </div>
-                    <span style={{ ...typeColor, padding: "4px 12px", borderRadius: 100, fontSize: 12, fontWeight: 600, textTransform: "capitalize" }}>
-                      {job.jobType}
-                    </span>
+              <article
+                key={job._id}
+                className="group flex flex-col rounded-xl border border-border bg-card p-5 shadow-soft transition-shadow hover:shadow-md"
+              >
+                <div className="mb-4 flex items-start justify-between gap-3">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10 text-primary">
+                    <Briefcase className="h-5 w-5" strokeWidth={1.75} />
                   </div>
+                  <span
+                    className={`rounded-full px-2.5 py-0.5 text-xs font-medium capitalize ${badgeClass}`}
+                  >
+                    {job.jobType}
+                  </span>
+                </div>
 
-                  {/* Title & Company */}
-                  <h3 style={{ fontSize: 17, fontWeight: 600, color: "#1e1b4b", marginBottom: 4 }}>{job.jobTitle}</h3>
-                  <p style={{ fontSize: 14, color: "#6366f1", fontWeight: 500, marginBottom: 12 }}>{job.company}</p>
+                <h2 className="text-base font-semibold text-foreground">
+                  {job.jobTitle}
+                </h2>
+                <p className="mt-0.5 text-sm text-primary">{job.company}</p>
 
-                  {/* Meta */}
-                  <div style={{ display: "flex", flexWrap: "wrap", gap: 12, marginBottom: 14 }}>
-                    <span style={{ display: "flex", alignItems: "center", gap: 4, fontSize: 13, color: "#64748b" }}>
-                      <MapPin size={13} /> {job.location}
+                <div className="mt-3 flex flex-wrap gap-3 text-xs text-muted-foreground">
+                  <span className="inline-flex items-center gap-1">
+                    <MapPin className="h-3.5 w-3.5" />
+                    {job.location}
+                  </span>
+                  {job.deadline && (
+                    <span
+                      className={`inline-flex items-center gap-1 ${
+                        isDeadlinePassed ? "text-destructive" : ""
+                      }`}
+                    >
+                      <Calendar className="h-3.5 w-3.5" />
+                      {isDeadlinePassed
+                        ? "Deadline passed"
+                        : `Due ${new Date(job.deadline).toLocaleDateString(undefined, {
+                            day: "numeric",
+                            month: "short",
+                          })}`}
                     </span>
-                    {job.deadline && (
-                      <span style={{ display: "flex", alignItems: "center", gap: 4, fontSize: 13, color: isDeadlinePassed ? "#ef4444" : "#64748b" }}>
-                        <Calendar size={13} />
-                        {isDeadlinePassed ? "Deadline passed" : `Due ${new Date(job.deadline).toLocaleDateString("en-IN", { day: "numeric", month: "short" })}`}
-                      </span>
-                    )}
-                  </div>
-
-                  {/* Description */}
-                  <p style={{ fontSize: 13, color: "#64748b", lineHeight: 1.7, marginBottom: 16, display: "-webkit-box", WebkitLineClamp: 3, WebkitBoxOrient: "vertical", overflow: "hidden" }}>
-                    {job.jobDescription}
-                  </p>
-
-                  {/* Skills */}
-                  {job.skills?.length > 0 && (
-                    <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginBottom: 16 }}>
-                      {job.skills.slice(0, 4).map((skill, i) => (
-                        <span key={i} style={{ padding: "3px 10px", background: "#f8f7ff", color: "#6d28d9", border: "1px solid #ede9fe", borderRadius: 100, fontSize: 12 }}>
-                          {skill}
-                        </span>
-                      ))}
-                      {job.skills.length > 4 && (
-                        <span style={{ padding: "3px 10px", background: "#f1f5f9", color: "#94a3b8", borderRadius: 100, fontSize: 12 }}>
-                          +{job.skills.length - 4} more
-                        </span>
-                      )}
-                    </div>
                   )}
                 </div>
 
-                {/* Posted by */}
-                <div style={{ fontSize: 12, color: "#94a3b8", marginBottom: 14, paddingTop: 12, borderTop: "1px solid #f8f7ff" }}>
-                  <Clock size={11} style={{ display: "inline", marginRight: 4 }} />
-                  Posted by <span style={{ fontWeight: 500, color: "#6366f1" }}>{job.postedBy?.username || "Admin"}</span>
+                <p className="mt-3 line-clamp-3 text-sm leading-relaxed text-muted-foreground">
+                  {job.jobDescription}
+                </p>
+
+                {job.skills?.length > 0 && (
+                  <div className="mt-3 flex flex-wrap gap-1.5">
+                    {job.skills.slice(0, 4).map((skill, i) => (
+                      <span
+                        key={i}
+                        className="rounded-full border border-border bg-muted/50 px-2 py-0.5 text-xs text-foreground"
+                      >
+                        {skill}
+                      </span>
+                    ))}
+                    {job.skills.length > 4 && (
+                      <span className="rounded-full bg-muted px-2 py-0.5 text-xs text-muted-foreground">
+                        +{job.skills.length - 4}
+                      </span>
+                    )}
+                  </div>
+                )}
+
+                <div className="mt-4 flex items-center gap-1 border-t border-border pt-4 text-xs text-muted-foreground">
+                  <Clock className="h-3.5 w-3.5" />
+                  <span>
+                    Posted by{" "}
+                    <span className="font-medium text-primary">
+                      {job.postedBy?.username || "Admin"}
+                    </span>
+                  </span>
                 </div>
 
-                {/* Apply Button */}
-                {appStatus === "success" ? (
-                  <div style={{ width: "100%", padding: 11, background: "#dcfce7", color: "#16a34a", borderRadius: 10, fontSize: 14, fontWeight: 600, display: "flex", alignItems: "center", justifyContent: "center", gap: 6 }}>
-                    <CheckCircle size={16} /> Applied Successfully!
-                  </div>
-                ) : appStatus === "already" ? (
-                  <div style={{ width: "100%", padding: 11, background: "#fef9c3", color: "#ca8a04", borderRadius: 10, fontSize: 14, fontWeight: 600, display: "flex", alignItems: "center", justifyContent: "center", gap: 6 }}>
-                    <CheckCircle size={16} /> Already Applied
-                  </div>
-                ) : appStatus === "error" ? (
-                  <div style={{ width: "100%", padding: 11, background: "#fee2e2", color: "#dc2626", borderRadius: 10, fontSize: 14, fontWeight: 600, display: "flex", alignItems: "center", justifyContent: "center", gap: 6 }}>
-                    <XCircle size={16} /> Failed — Try Again
-                  </div>
-                ) : (
-                  <button
-                    className="apply-btn"
-                    onClick={() => handleApply(job._id)}
-                    disabled={applying === job._id || isDeadlinePassed}
-                  >
-                    {applying === job._id ? (
-                      <><Loader size={14} style={{ animation: "spin 1s linear infinite" }} /> Applying...</>
-                    ) : isDeadlinePassed ? (
-                      "Deadline Passed"
-                    ) : (
-                      <><Send size={14} /> Apply Now</>
-                    )}
-                  </button>
-                )}
-              </div>
+                <div className="mt-4">
+                  {appStatus === "success" ? (
+                    <div className="flex w-full items-center justify-center gap-2 rounded-lg bg-emerald-500/10 py-2.5 text-sm font-medium text-emerald-700 dark:text-emerald-400">
+                      <CheckCircle className="h-4 w-4" />
+                      Applied
+                    </div>
+                  ) : appStatus === "already" ? (
+                    <div className="flex w-full items-center justify-center gap-2 rounded-lg bg-amber-500/10 py-2.5 text-sm font-medium text-amber-700 dark:text-amber-400">
+                      <CheckCircle className="h-4 w-4" />
+                      Already applied
+                    </div>
+                  ) : appStatus === "error" ? (
+                    <div className="flex w-full items-center justify-center gap-2 rounded-lg bg-destructive/10 py-2.5 text-sm font-medium text-destructive">
+                      <XCircle className="h-4 w-4" />
+                      Try again
+                    </div>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() => handleApply(job._id)}
+                      disabled={applying === job._id || isDeadlinePassed}
+                      className="btn-primary flex w-full items-center gap-2"
+                    >
+                      {applying === job._id ? (
+                        <>
+                          <Loader className="h-4 w-4 animate-spin" />
+                          Applying…
+                        </>
+                      ) : isDeadlinePassed ? (
+                        "Closed"
+                      ) : (
+                        <>
+                          <Send className="h-4 w-4" />
+                          Apply
+                        </>
+                      )}
+                    </button>
+                  )}
+                </div>
+              </article>
             );
           })}
         </div>

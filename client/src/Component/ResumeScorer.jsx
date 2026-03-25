@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import axiosInstance from "../utils/axiosInstance";
+import { toast } from "sonner";
 import {
   UploadCloud, CheckCircle, AlertTriangle,
   Lightbulb, Loader, FileText, Target,
@@ -32,7 +33,10 @@ const ResumeScorer = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!file || !role) return alert("Please upload a resume and enter a target role");
+    if (!file || !role) {
+      toast.error("Add a PDF and target role.");
+      return;
+    }
 
     setLoading(true);
     setResult(null);
@@ -42,14 +46,12 @@ const ResumeScorer = () => {
     formData.append("resume", file);
 
     try {
-      const token = localStorage.getItem("token");
       const res = await axiosInstance.post("/resume/analyze", formData, {
-        headers: { Authorization: `Bearer ${token}` },
         timeout: 120000,
       });
       setResult(res.data);
     } catch (err) {
-      alert(err.response?.data?.message || "Analysis failed. Please try again.");
+      toast.error(err.response?.data?.message || "Analysis failed. Try again.");
     } finally {
       setLoading(false);
     }
@@ -74,29 +76,27 @@ const ResumeScorer = () => {
   };
 
   return (
-    <div className="max-w-6xl mx-auto p-4 md:p-8 space-y-8">
-
-      {/* Header */}
-      <div className="text-center space-y-2">
-        <h1 className="text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-indigo-600 to-violet-600">
-          AI Resume Analyzer
+    <div className="mx-auto max-w-6xl space-y-8 p-1 md:p-2">
+      <div className="space-y-1 border-b border-border pb-6 text-center md:text-left">
+        <h1 className="text-2xl font-semibold tracking-tight text-foreground md:text-3xl">
+          Resume analyzer
         </h1>
-        <p className="text-slate-500">
-          Upload your resume and get professional ATS feedback tailored to your target role.
+        <p className="max-w-xl text-sm text-muted-foreground md:mx-0 mx-auto">
+          Upload a PDF and a target role. We return an ATS-style score, strengths, gaps, and keywords.
         </p>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-5 gap-8 items-start">
-
-        {/* Upload Form */}
+      <div className="grid grid-cols-1 items-start gap-8 lg:grid-cols-5">
         <div className="lg:col-span-2">
-          <div className="bg-white p-6 rounded-2xl shadow-lg border border-slate-100">
+          <div className="card-panel p-6">
             <form onSubmit={handleSubmit} className="space-y-5">
 
               {/* Drag & Drop */}
               <div
-                className={`border-2 border-dashed rounded-xl p-8 text-center transition-all cursor-pointer ${
-                  dragActive ? "border-indigo-500 bg-indigo-50" : "border-slate-200 hover:border-indigo-300"
+                className={`cursor-pointer rounded-xl border-2 border-dashed p-8 text-center transition-all ${
+                  dragActive
+                    ? "border-primary bg-primary/5"
+                    : "border-border hover:border-primary/40"
                 }`}
                 onDragEnter={handleDrag}
                 onDragLeave={handleDrag}
@@ -105,37 +105,37 @@ const ResumeScorer = () => {
               >
                 <input type="file" id="resume-upload" className="hidden" onChange={handleChange} accept=".pdf" />
                 <label htmlFor="resume-upload" className="cursor-pointer flex flex-col items-center gap-3">
-                  <div className="p-3 bg-indigo-50 rounded-full">
-                    <UploadCloud className="w-7 h-7 text-indigo-600" />
+                  <div className="rounded-full bg-primary/10 p-3">
+                    <UploadCloud className="h-7 w-7 text-primary" />
                   </div>
                   <div>
-                    <p className="font-semibold text-slate-700 text-sm">
-                      {file ? file.name : "Drag & drop or click to upload"}
+                    <p className="text-sm font-semibold text-foreground">
+                      {file ? file.name : "Drop PDF here or click to browse"}
                     </p>
-                    <p className="text-xs text-slate-400 mt-1">PDF only · Max 5MB</p>
+                    <p className="mt-1 text-xs text-muted-foreground">PDF · max 5MB</p>
                   </div>
                 </label>
               </div>
 
               {/* Role Input */}
-              <div className="space-y-1">
-                <label className="flex items-center gap-2 text-sm font-semibold text-slate-700">
-                  <Target size={15} className="text-indigo-500" />
-                  Target Role
+              <div className="space-y-2">
+                <label className="form-label mb-0 flex items-center gap-2 normal-case tracking-normal">
+                  <Target size={14} className="text-primary" />
+                  Target role
                 </label>
                 <input
                   type="text"
                   value={role}
                   onChange={(e) => setRole(e.target.value)}
-                  placeholder="e.g. Full Stack Developer"
-                  className="w-full p-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-400 outline-none text-sm"
+                  placeholder="e.g. Full-stack developer"
+                  className="input-ctrl"
                 />
               </div>
 
               <button
                 type="submit"
                 disabled={!file || !role || loading}
-                className="w-full py-3 bg-indigo-600 text-white rounded-xl font-bold hover:bg-indigo-700 transition disabled:opacity-50"
+                className="btn-primary h-11 font-semibold shadow-md shadow-primary/20 disabled:opacity-50"
               >
                 {loading ? (
                   <span className="flex items-center justify-center gap-2">
@@ -148,35 +148,32 @@ const ResumeScorer = () => {
         </div>
 
         {/* Results */}
-        <div className="lg:col-span-3 space-y-5">
-
-          {/* Empty State */}
+        <div className="space-y-5 lg:col-span-3">
           {!result && !loading && (
-            <div className="h-80 border-2 border-dashed border-slate-100 rounded-2xl flex flex-col items-center justify-center text-slate-300">
-              <FileText size={56} strokeWidth={1} />
-              <p className="mt-3 font-medium text-sm">Results will appear here</p>
+            <div className="flex h-80 flex-col items-center justify-center rounded-2xl border-2 border-dashed border-border text-muted-foreground">
+              <FileText size={48} strokeWidth={1} className="opacity-40" />
+              <p className="mt-3 text-sm font-medium">Results appear here after analysis</p>
             </div>
           )}
 
-          {/* Loading */}
           {loading && (
-            <div className="bg-white p-12 rounded-2xl shadow-lg border flex flex-col items-center gap-4">
-              <Loader className="animate-spin w-12 h-12 text-indigo-600" />
+            <div className="card-panel flex flex-col items-center gap-4 p-12">
+              <Loader className="h-12 w-12 animate-spin text-primary" />
               <div className="text-center">
-                <p className="font-bold text-slate-800">Analyzing your resume...</p>
-                <p className="text-slate-400 text-sm mt-1">This may take up to 30 seconds</p>
+                <p className="font-semibold text-foreground">Analyzing…</p>
+                <p className="mt-1 text-sm text-muted-foreground">Can take up to a minute</p>
               </div>
             </div>
           )}
 
           {result && (
             <div className="space-y-5">
-
-              {/* Score Card */}
-              <div className="bg-white p-6 rounded-2xl shadow-lg border border-slate-100">
+              <div className="card-panel p-6">
                 <div className="flex justify-between items-start mb-4">
                   <div>
-                    <p className="text-xs uppercase tracking-wider text-slate-400 font-semibold">ATS Score</p>
+                    <p className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+                      Fit score
+                    </p>
                     <p className={`text-6xl font-black ${getScoreColor(result.score)}`}>
                       {result.score}<span className="text-2xl">%</span>
                     </p>
@@ -194,7 +191,7 @@ const ResumeScorer = () => {
                     )}
                   </div>
                 </div>
-                <div className="w-full bg-slate-100 h-3 rounded-full overflow-hidden">
+                <div className="h-3 w-full overflow-hidden rounded-full bg-muted">
                   <div
                     className={`h-full rounded-full bg-gradient-to-r ${getScoreGradient(result.score)} transition-all duration-1000`}
                     style={{ width: `${result.score}%` }}
@@ -203,21 +200,21 @@ const ResumeScorer = () => {
 
                 {/* Overall Verdict */}
                 {result.overallVerdict && (
-                  <p className="mt-4 text-sm text-slate-600 bg-slate-50 rounded-xl p-3 border border-slate-100 italic">
-                    "{result.overallVerdict}"
+                  <p className="mt-4 rounded-xl border border-border bg-muted/30 p-3 text-sm italic text-foreground">
+                    &ldquo;{result.overallVerdict}&rdquo;
                   </p>
                 )}
               </div>
 
               {/* Strengths */}
               {result.strengths?.length > 0 && (
-                <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
-                  <h4 className="flex items-center gap-2 font-bold text-green-700 mb-4">
+                <div className="card-panel p-6">
+                  <h4 className="mb-4 flex items-center gap-2 font-semibold text-emerald-700 dark:text-emerald-400">
                     <CheckCircle size={18} /> Strengths
                   </h4>
                   <ul className="space-y-2">
                     {result.strengths.map((s, i) => (
-                      <li key={i} className="flex items-start gap-2 text-sm text-slate-600">
+                      <li key={i} className="flex items-start gap-2 text-sm text-muted-foreground">
                         <span className="mt-1 w-2 h-2 bg-green-400 rounded-full shrink-0" />
                         {s}
                       </li>
@@ -228,13 +225,13 @@ const ResumeScorer = () => {
 
               {/* Weaknesses */}
               {result.weaknesses?.length > 0 && (
-                <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
-                  <h4 className="flex items-center gap-2 font-bold text-red-600 mb-4">
+                <div className="card-panel p-6">
+                  <h4 className="mb-4 flex items-center gap-2 font-semibold text-red-600 dark:text-red-400">
                     <AlertTriangle size={18} /> Areas to Improve
                   </h4>
                   <ul className="space-y-2">
                     {result.weaknesses.map((w, i) => (
-                      <li key={i} className="flex items-start gap-2 text-sm text-slate-600">
+                      <li key={i} className="flex items-start gap-2 text-sm text-muted-foreground">
                         <span className="mt-1 w-2 h-2 bg-red-400 rounded-full shrink-0" />
                         {w}
                       </li>
@@ -245,13 +242,13 @@ const ResumeScorer = () => {
 
               {/* Suggestions */}
               {result.suggestions?.length > 0 && (
-                <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
-                  <h4 className="flex items-center gap-2 font-bold text-indigo-700 mb-4">
+                <div className="card-panel p-6">
+                  <h4 className="mb-4 flex items-center gap-2 font-semibold text-primary">
                     <Lightbulb size={18} /> Actionable Suggestions
                   </h4>
                   <ul className="space-y-2">
                     {result.suggestions.map((s, i) => (
-                      <li key={i} className="flex items-start gap-2 text-sm text-slate-600">
+                      <li key={i} className="flex items-start gap-2 text-sm text-muted-foreground">
                         <Zap size={14} className="text-indigo-400 mt-0.5 shrink-0" />
                         {s}
                       </li>
@@ -262,8 +259,8 @@ const ResumeScorer = () => {
 
               {/* Missing Keywords */}
               {result.missingKeywords?.length > 0 && (
-                <div className="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
-                  <h4 className="flex items-center gap-2 font-bold text-amber-700 mb-4">
+                <div className="card-panel p-6">
+                  <h4 className="mb-4 flex items-center gap-2 font-semibold text-amber-700 dark:text-amber-400">
                     <Tag size={18} /> Missing Keywords
                   </h4>
                   <div className="flex flex-wrap gap-2">

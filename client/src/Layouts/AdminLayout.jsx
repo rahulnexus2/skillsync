@@ -1,162 +1,127 @@
-import { Outlet, Link, useLocation } from 'react-router-dom';
-import React, { useState, useEffect } from 'react';
-import { User, Briefcase, MessageCircle, Menu, X, Sparkles } from 'lucide-react';
-
-// Reusable Navigation Item (handles Profile too)
-const NavItem = ({ to, icon, label, isActive, mobile = false, onClick }) => {
-  const Icon = icon;
-  const baseClasses = mobile
-    ? 'flex items-center space-x-4 px-6 py-4 rounded-2xl transition-all duration-300 transform hover:scale-[1.02]'
-    : 'group flex items-center space-x-3 px-6 py-3 rounded-2xl transition-all duration-300 transform hover:scale-105';
-
-  const activeClasses = mobile
-    ? 'bg-gradient-to-r from-blue-500 to-indigo-500 text-white shadow-lg'
-    : 'bg-gradient-to-r from-blue-500 to-indigo-500 text-white shadow-lg shadow-blue-500/25';
-
-  const inactiveClasses = mobile
-    ? 'text-slate-600 hover:bg-white/70 hover:text-slate-800 hover:shadow-md'
-    : 'text-slate-600 hover:bg-white/70 hover:text-slate-800 hover:shadow-lg hover:shadow-slate-200/50';
-
-  return (
-    <Link
-      to={to}
-      onClick={onClick}
-      className={`${baseClasses} ${isActive ? activeClasses : inactiveClasses}`}
-    >
-      <Icon
-        className={`w-${mobile ? 6 : 5} h-${mobile ? 6 : 5} transition-transform duration-200 ${isActive && !mobile ? 'text-white' : ''
-          }`}
-      />
-      <span className={`${mobile ? 'font-semibold text-lg' : 'font-semibold'}`}>{label}</span>
-    </Link>
-  );
-};
+import { Outlet, Link, useLocation } from "react-router-dom";
+import React, { useState, useEffect } from "react";
+import { User, Briefcase, MessageCircle, Menu, X, Sparkles } from "lucide-react";
+import { DashboardNavItem } from "../components/DashboardNavItem";
+import { ThemeToggle } from "../components/ThemeToggle";
 
 export const AdminDashLayout = () => {
   const location = useLocation();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [activeItem, setActiveItem] = useState(location.pathname || '/admin/dashboard');
+  const [activeItem, setActiveItem] = useState(
+    location.pathname || "/admin/dashboard"
+  );
 
   const navItems = [
-    { to: '/admin/dashboard', icon: User, label: 'Dashboard' },
-    { to: '/admin/jobs', icon: Briefcase, label: 'Jobs' },
-    { to: '/admin/chatroom', icon: MessageCircle, label: 'Chatroom' }
+    { to: "/admin/dashboard", icon: User, label: "Dashboard" },
+    { to: "/admin/jobs", icon: Briefcase, label: "Jobs" },
+    { to: "/admin/chatroom", icon: MessageCircle, label: "Chat" },
   ];
-
-  const handleNavClick = (to) => setActiveItem(to);
 
   useEffect(() => {
     setIsMobileMenuOpen(false);
-    setActiveItem(location.pathname); // update active item on route change
+    setActiveItem(location.pathname);
   }, [location]);
 
   return (
-    <div className="flex flex-col min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-100 relative overflow-hidden">
-      {/* Decorative Background */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        <div className="absolute -top-40 -right-40 w-80 h-80 bg-gradient-to-br from-blue-400/20 to-indigo-400/20 rounded-full blur-3xl"></div>
-        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-gradient-to-tr from-indigo-400/20 to-purple-400/20 rounded-full blur-3xl"></div>
-        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-gradient-to-r from-blue-300/10 to-indigo-300/10 rounded-full blur-3xl"></div>
-      </div>
-
-      {/* Header */}
-      <header className="sticky top-0 z-50 bg-white/80 backdrop-blur-md shadow-xl border-b border-white/20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between h-20">
-            {/* Logo */}
-            <div className="flex items-center space-x-4">
-              <div className="relative">
-                <div className="w-14 h-14 bg-gradient-to-r from-blue-600 to-indigo-600 rounded-2xl flex items-center justify-center shadow-lg transform hover:scale-105 transition-transform duration-200">
-                  <Sparkles className="w-7 h-7 text-white" />
-                </div>
-                <div className="absolute -top-1 -right-1 w-4 h-4 bg-yellow-400 rounded-full animate-pulse"></div>
-              </div>
-              <div>
-                <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 bg-clip-text text-transparent">
-                  SkillSync
-                </h1>
-                <p className="text-sm sm:text-base md:text-lg text-slate-600 font-medium tracking-wide">Get Hired</p>
-              </div>
+    <div className="flex min-h-screen flex-col bg-background">
+      <header className="sticky top-0 z-50 border-b border-border bg-card/90 backdrop-blur-md">
+        <div className="mx-auto flex h-14 max-w-7xl items-center justify-between gap-4 px-4 sm:px-6">
+          <Link
+            to="/admin/dashboard"
+            className="flex min-w-0 items-center gap-2.5"
+          >
+            <div className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-primary text-primary-foreground shadow-sm">
+              <Sparkles className="h-4 w-4" strokeWidth={1.75} />
             </div>
+            <div className="min-w-0 text-left">
+              <p className="truncate text-sm font-semibold tracking-tight text-foreground">
+                SkillSync
+              </p>
+              <p className="text-xs text-muted-foreground">Recruiter</p>
+            </div>
+          </Link>
 
-            {/* Desktop Navigation */}
-            <nav className="hidden md:flex items-center space-x-2">
-              {navItems.map((item) => (
-                <NavItem
-                  key={item.to}
-                  to={item.to}
-                  icon={item.icon}
-                  label={item.label}
-                  isActive={activeItem === item.to}
-                  onClick={() => handleNavClick(item.to)}
-                />
-              ))}
-            </nav>
+          <nav className="hidden items-center gap-1 md:flex">
+            {navItems.map((item) => (
+              <DashboardNavItem
+                key={item.to}
+                to={item.to}
+                icon={item.icon}
+                label={item.label}
+                isActive={activeItem === item.to}
+                onClick={() => setActiveItem(item.to)}
+              />
+            ))}
+          </nav>
 
-            {/* Mobile Menu Button */}
+          <div className="flex items-center gap-2">
+            <ThemeToggle />
             <button
+              type="button"
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-              className="md:hidden p-3 rounded-xl text-slate-600 hover:bg-white/70 hover:text-slate-800 transition-all duration-200 transform hover:scale-105"
-              aria-label="Toggle Mobile Menu"
+              className="flex h-9 w-9 items-center justify-center rounded-lg border border-border bg-card text-muted-foreground transition-colors hover:bg-muted hover:text-foreground md:hidden"
+              aria-label="Toggle menu"
               aria-expanded={isMobileMenuOpen}
             >
-              {isMobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
+              {isMobileMenuOpen ? (
+                <X className="h-5 w-5" />
+              ) : (
+                <Menu className="h-5 w-5" />
+              )}
             </button>
           </div>
+        </div>
 
-          {/* Mobile Dropdown */}
-          <div
-            className={`md:hidden transition-all duration-500 ease-in-out ${isMobileMenuOpen ? 'max-h-80 opacity-100 pb-6' : 'max-h-0 opacity-0'
-              } overflow-hidden`}
-          >
-            <nav className="space-y-3 pt-4">
-              {navItems.map((item) => (
-                <NavItem
-                  key={item.to}
-                  to={item.to}
-                  icon={item.icon}
-                  label={item.label}
-                  isActive={activeItem === item.to}
-                  onClick={() => handleNavClick(item.to)}
-                  mobile
-                />
-              ))}
-            </nav>
-          </div>
+        <div
+          className={`border-t border-border bg-card md:hidden ${
+            isMobileMenuOpen ? "max-h-96 py-3" : "max-h-0 overflow-hidden py-0"
+          } transition-all duration-200 ease-out`}
+        >
+          <nav className="flex flex-col gap-1 px-4 pb-2">
+            {navItems.map((item) => (
+              <DashboardNavItem
+                key={item.to}
+                to={item.to}
+                icon={item.icon}
+                label={item.label}
+                mobile
+                isActive={activeItem === item.to}
+                onClick={() => setActiveItem(item.to)}
+              />
+            ))}
+          </nav>
         </div>
       </header>
 
-      {/* Main Content */}
-      <main className="flex-1 p-4 sm:p-6 lg:p-8 relative z-10">
-        <div className="max-w-7xl mx-auto">
-          <div className="bg-white/70 backdrop-blur-sm rounded-3xl shadow-2xl border border-white/30 min-h-[600px] p-6 lg:p-10 transform hover:shadow-3xl transition-all duration-300">
+      <main className="flex-1 px-4 py-6 sm:px-6 sm:py-8 md:pb-8 pb-24">
+        <div className="mx-auto max-w-7xl">
+          <div className="min-h-[min(70vh,720px)] rounded-xl border border-border bg-card p-5 shadow-soft sm:p-8 lg:p-10">
             <Outlet />
           </div>
         </div>
       </main>
 
-      {/* Mobile Bottom Nav */}
-      <nav className="md:hidden relative z-10 bg-white/90 backdrop-blur-md shadow-2xl border-t border-white/30">
-        <div className="flex justify-around py-2">
+      <nav className="fixed bottom-0 left-0 right-0 z-40 border-t border-border bg-card/95 backdrop-blur-md md:hidden">
+        <div className="mx-auto flex max-w-lg items-stretch justify-around px-1 py-1.5">
           {navItems.map((item) => (
-            <NavItem
+            <Link
               key={item.to}
               to={item.to}
-              icon={item.icon}
-              label={item.label}
-              isActive={activeItem === item.to}
-              onClick={() => handleNavClick(item.to)}
-              mobile
-            />
+              onClick={() => setActiveItem(item.to)}
+              className={`flex min-w-0 flex-1 flex-col items-center justify-center gap-0.5 rounded-lg py-2 transition-colors ${
+                activeItem === item.to
+                  ? "text-primary"
+                  : "text-muted-foreground hover:text-foreground"
+              }`}
+            >
+              <item.icon className="h-5 w-5 shrink-0" strokeWidth={1.75} />
+              <span className="max-w-[4.5rem] truncate text-[10px] font-medium">
+                {item.label}
+              </span>
+            </Link>
           ))}
         </div>
       </nav>
-
-      {/* Floating Decorative Elements */}
-      <div className="fixed top-24 left-6 w-2 h-2 bg-blue-400/40 rounded-full animate-pulse"></div>
-      <div className="fixed top-48 right-10 w-3 h-3 bg-indigo-400/30 rounded-full animate-pulse delay-1000"></div>
-      <div className="fixed bottom-40 left-12 w-1 h-1 bg-purple-400/50 rounded-full animate-pulse delay-500"></div>
-      <div className="fixed top-1/3 right-6 w-2 h-2 bg-blue-300/40 rounded-full animate-pulse delay-700"></div>
     </div>
   );
 };

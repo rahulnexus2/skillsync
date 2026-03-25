@@ -2,11 +2,8 @@ import jwt from "jsonwebtoken";
 
 export const login = async (req, res) => {
   try {
-    const user = req.user;   // set by loginAuth middleware
-    const role = req.role;   // "user" or "admin"
-     console.log("Login controller hit");
-    console.log("req.user:", req.user);
-    console.log("req.role:", req.role);
+    const user = req.user;
+    const role = req.role;
 
     const token = jwt.sign(
       { id: user._id, role },

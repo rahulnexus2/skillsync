@@ -1,6 +1,6 @@
 import { Message } from "../models/MessageModel.js";
-import User from "../models/UserModel.js";
 import Application from "../models/ApplicationModel.js";
+import { logger } from "../utils/logger.js";
 
 // ===============================
 // Admin: Get only users assigned to this admin
@@ -20,7 +20,7 @@ export const getUsersForChat = async (req, res) => {
     res.status(200).json(users);
 
   } catch (error) {
-    console.error("Error fetching users:", error);
+    logger.error("Error fetching users:", error.message);
     res.status(500).json({ message: "Error fetching users" });
   }
 };
@@ -64,7 +64,7 @@ export const getAdminChatHistory = async (req, res) => {
     res.status(200).json(messages);
 
   } catch (error) {
-    console.error("Error fetching admin chat history:", error);
+    logger.error("Error fetching admin chat history:", error.message);
     res.status(500).json({ message: "Error fetching history" });
   }
 };
@@ -104,7 +104,7 @@ export const getUserChatHistory = async (req, res) => {
     res.status(200).json(messages);
 
   } catch (error) {
-    console.error("Error fetching user chat history:", error);
+    logger.error("Error fetching user chat history:", error.message);
     res.status(500).json({ message: "Error fetching history" });
   }
 };

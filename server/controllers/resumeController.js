@@ -1,5 +1,6 @@
 import axios from "axios";
 import { extractText, getDocumentProxy } from "unpdf";
+import { logger } from "../utils/logger.js";
 
 const HF_API_KEY = process.env.HF_API_KEY;
 
@@ -54,7 +55,6 @@ ${resumeText.slice(0, 2500)}`,
     );
 
     const generatedText = response.data.choices?.[0]?.message?.content;
-    console.log("AI Raw Response:", generatedText);
 
     if (!generatedText) throw new Error("No generated text");
 
@@ -65,7 +65,7 @@ ${resumeText.slice(0, 2500)}`,
     return JSON.parse(jsonMatch[0]);
 
   } catch (err) {
-    console.error("AI Analysis error:", err.message);
+    logger.error("AI analysis error:", err.message);
 
     return {
       overallVerdict: `Candidate shows potential for the ${role} role but resume needs optimization.`,
@@ -123,10 +123,9 @@ export const scoreResume = async (req, res) => {
     });
 
   } catch (error) {
-    console.error("FULL ERROR:", error.response?.data || error.message);
+    logger.error("scoreResume error:", error.response?.data || error.message);
     return res.status(500).json({
       message: "Analysis failed",
-      error: error.response?.data || error.message,
     });
   }
 };

@@ -1,6 +1,7 @@
 import Application from "../models/ApplicationModel.js";
 import Job from "../models/JobModel.js";
 import mongoose from "mongoose";
+import { logger } from "../utils/logger.js";
 
 // ===============================
 // USER: APPLY FOR JOB
@@ -39,13 +40,8 @@ export const applyForJob = async (req, res) => {
 export const getAdminApplications = async (req, res) => {
   try {
     const adminId = new mongoose.Types.ObjectId(req.admin._id);
-    const allJobs = await Job.find({});
-console.log("All jobs postedBy:", JSON.stringify(allJobs.map(j => j.postedBy)));
-console.log("Looking for adminId:", adminId);
 
-    // Find all jobs posted by this admin
     const jobs = await Job.find({ "postedBy.id": adminId });
-    console.log("Jobs found for admin:", jobs.length);
 
     const jobIds = jobs.map((job) => job._id);
 
@@ -60,12 +56,10 @@ console.log("Looking for adminId:", adminId);
       .populate("userId", "username email phone education skills projects")
       .sort({ createdAt: -1 });
 
-    console.log("Applications found:", applications.length);
-
     res.status(200).json(applications);
 
   } catch (error) {
-    console.error("Get admin applications error:", error);
+    logger.error("Get admin applications error:", error.message);
     res.status(500).json({ message: "Server error", error: error.message });
   }
 };
@@ -106,7 +100,7 @@ export const updateApplicationStatus = async (req, res) => {
     });
 
   } catch (error) {
-    console.error("Update status error:", error);
+    logger.error("Update status error:", error.message);
     res.status(500).json({ message: "Server error" });
   }
 };
@@ -134,7 +128,7 @@ export const getChatStatus = async (req, res) => {
     });
 
   } catch (error) {
-    console.error("Chat status error:", error);
+    logger.error("Chat status error:", error.message);
     res.status(500).json({ message: "Server error" });
   }
 };

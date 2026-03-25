@@ -27,6 +27,7 @@ import JobUpdate from "../JobCrud/JobUpdate";
 import JobViewAll from "../JobCrud/JobViewAll";
 import JobCreation from "../JobCrud/JobCreation";
 import JobDetails from "../JobCrud/JobDetails";
+import { UserProtectedRoute, AdminProtectedRoute } from "./ProtectedRoute";
 
 export const RouteConfig = () => {
   return (
@@ -43,24 +44,28 @@ export const RouteConfig = () => {
       </Route>
 
       {/* ---------------- User Protected Routes ---------------- */}
-      <Route path="/user" element={<UserDashLayout />}>
-        <Route index element={<Navigate to="profile" replace />} />
-        <Route path="profile" element={<UserAbout />} />
-        <Route path="jobs" element={<UserJobs />} />
-        <Route path="chatroom" element={<UserChat />} />
-        <Route path="resume-scorer" element={<ResumeScorer />} />
+      <Route element={<UserProtectedRoute />}>
+        <Route path="/user" element={<UserDashLayout />}>
+          <Route index element={<Navigate to="profile" replace />} />
+          <Route path="profile" element={<UserAbout />} />
+          <Route path="jobs" element={<UserJobs />} />
+          <Route path="chatroom" element={<UserChat />} />
+          <Route path="resume-scorer" element={<ResumeScorer />} />
+        </Route>
       </Route>
 
       {/* ---------------- Admin Protected Routes ---------------- */}
-      <Route path="/admin" element={<AdminDashLayout />}>
-        <Route index element={<Navigate to="dashboard" replace />} />
-        <Route path="dashboard" element={<AdminAbout />} />
-        <Route path="chatroom" element={<AdminChat />} />
-        <Route path="jobs" element={<Jobs />}>
-          <Route index element={<JobViewAll />} />
-          <Route path="create" element={<JobCreation />} />
-          <Route path="view/:jobId" element={<JobDetails />} />
-          <Route path="update/:jobId" element={<JobUpdate />} />
+      <Route element={<AdminProtectedRoute />}>
+        <Route path="/admin" element={<AdminDashLayout />}>
+          <Route index element={<Navigate to="dashboard" replace />} />
+          <Route path="dashboard" element={<AdminAbout />} />
+          <Route path="chatroom" element={<AdminChat />} />
+          <Route path="jobs" element={<Jobs />}>
+            <Route index element={<JobViewAll />} />
+            <Route path="create" element={<JobCreation />} />
+            <Route path="view/:jobId" element={<JobDetails />} />
+            <Route path="update/:jobId" element={<JobUpdate />} />
+          </Route>
         </Route>
       </Route>
 

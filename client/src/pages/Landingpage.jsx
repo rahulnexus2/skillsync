@@ -1,5 +1,6 @@
 import React, { useEffect, useRef, useState } from "react";
 import { Link } from "react-router-dom";
+import { ThemeToggle } from "../components/ThemeToggle";
 
 const useInView = (threshold = 0.15) => {
   const ref = useRef(null);
@@ -85,7 +86,7 @@ export const Landingpage = () => {
   }, []);
 
   return (
-    <div style={{ fontFamily: "'DM Sans', sans-serif", background: "#fafafa", color: "#0f0f0f" }}>
+    <div className="min-h-screen bg-background font-sans text-foreground antialiased">
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,300&family=Instrument+Serif:ital@0;1&display=swap');
         
@@ -200,6 +201,29 @@ export const Landingpage = () => {
           padding: 20px 28px;
           text-align: center;
         }
+
+        .dark .nav-pill {
+          background: rgba(24, 24, 27, 0.85);
+          border-color: rgba(63, 63, 70, 0.6);
+        }
+        .dark .feature-card,
+        .dark .stat-card {
+          background: rgb(24, 24, 27);
+          border-color: rgb(39, 39, 42);
+          color: rgb(250, 250, 250);
+        }
+        .dark .grid-bg {
+          background-image: linear-gradient(rgba(129, 140, 248, 0.06) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(129, 140, 248, 0.06) 1px, transparent 1px);
+        }
+        .dark .hero-bg h1 { color: #fafafa !important; }
+        .dark .hero-bg p { color: #a1a1aa !important; }
+        .dark .badge {
+          background: rgba(39, 39, 42, 0.9);
+          border-color: #52525b;
+          color: #e4e4e7;
+        }
+        .dark .landing-brand { color: #fafafa !important; }
       `}</style>
 
       {/* NAV */}
@@ -212,9 +236,10 @@ export const Landingpage = () => {
             <div style={{ width: 28, height: 28, background: "linear-gradient(135deg, #6366f1, #7c3aed)", borderRadius: 8, display: "flex", alignItems: "center", justifyContent: "center" }}>
               <span style={{ color: "white", fontSize: 14, fontWeight: 700 }}>S</span>
             </div>
-            <span style={{ fontWeight: 600, fontSize: 16, color: "#1e1b4b" }}>SkillSync</span>
+            <span className="landing-brand" style={{ fontWeight: 600, fontSize: 16, color: "#1e1b4b" }}>SkillSync</span>
           </div>
-          <div style={{ display: "flex", gap: 12 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+            <ThemeToggle />
             <Link to="/login" className="ghost-btn" style={{ padding: "8px 20px", fontSize: 14 }}>Sign In</Link>
             <Link to="/signup" className="cta-btn" style={{ padding: "8px 20px", fontSize: 14 }}>Get Started</Link>
           </div>
