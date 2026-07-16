@@ -29,6 +29,7 @@ The core highlight of SkillSync is its **AI Resume Scorer**, which instantly eva
 - **Icons & UI**: [Lucide React](https://lucide.dev/), Sonner (Toasts)
 - **Forms**: React Hook Form, Zod
 
+
 ### Backend (Server)
 - **Core**: Node.js, [Express.js](https://expressjs.com/)
 - **Database**: [MongoDB](https://www.mongodb.com/) with Mongoose
